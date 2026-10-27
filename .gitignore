@@ -53,3 +53,20 @@ app.*.map.json
 # Temporary screenshots and scratch
 screencap*.png
 /scratch/
+
+# Android signing keys & credentials
+key.properties
+*.jks
+*.keystore
+google-services.json
+
+# Environment variables & web secrets
+.env
+.env*.local
+.env.production
+
+# Node & Next.js platform build
+**/node_modules/
+**/.next/
+**/.vercel/
+

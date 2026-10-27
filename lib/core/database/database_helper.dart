@@ -20,6 +20,22 @@ import '../../models/poultry_product.dart';
 import '../../models/sync_item.dart';
 import '../../models/notification_campaign.dart';
 
+class InsufficientFeedStockException implements Exception {
+  final double availableStockKg;
+  final double requestedKg;
+  final String feedName;
+
+  const InsufficientFeedStockException({
+    required this.availableStockKg,
+    required this.requestedKg,
+    required this.feedName,
+  });
+
+  @override
+  String toString() =>
+      'Insufficient feed stock for "$feedName": Available ${availableStockKg.toStringAsFixed(2)} kg, requested ${requestedKg.toStringAsFixed(2)} kg.';
+}
+
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
@@ -173,7 +189,13 @@ class DatabaseHelper {
         electricity_kwh_rate REAL NOT NULL,
         reminders_enabled INTEGER NOT NULL,
         reminder_time TEXT NOT NULL,
-        theme_mode TEXT NOT NULL DEFAULT 'system'
+        theme_mode TEXT NOT NULL DEFAULT 'system',
+        auto_feed_deduction INTEGER NOT NULL DEFAULT 0,
+        article_notifications_enabled INTEGER NOT NULL DEFAULT 1,
+        marketing_notifications_enabled INTEGER NOT NULL DEFAULT 0,
+        ads_enabled INTEGER NOT NULL DEFAULT 1,
+        cloud_sync_enabled INTEGER NOT NULL DEFAULT 0,
+        last_sync_timestamp TEXT
       )
     ''');
 
@@ -194,6 +216,8 @@ class DatabaseHelper {
         current_count INTEGER NOT NULL,
         male_count INTEGER NOT NULL,
         female_count INTEGER NOT NULL,
+        start_male_count INTEGER NOT NULL DEFAULT 0,
+        start_female_count INTEGER NOT NULL DEFAULT 0,
         purchase_price_per_bird REAL NOT NULL,
         total_purchase_cost REAL NOT NULL,
         supplier TEXT NOT NULL,
@@ -380,6 +404,8 @@ class DatabaseHelper {
         status TEXT NOT NULL,
         extra_costs REAL NOT NULL,
         notes TEXT NOT NULL,
+        is_transferred INTEGER NOT NULL DEFAULT 0,
+        transferred_flock_id TEXT,
         created_at TEXT NOT NULL
       )
     ''');
@@ -675,13 +701,18 @@ class DatabaseHelper {
   Future<void> recordFeedTransaction(FeedTransaction tx) async {
     final db = await database;
     await db.transaction((txn) async {
-      await txn.insert(
+      // Idempotency check: If transaction ID already exists, do not re-apply stock changes
+      final existingTx = await txn.query(
         'feed_transactions',
-        tx.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
+        where: 'id = ?',
+        whereArgs: [tx.id],
+        limit: 1,
       );
+      if (existingTx.isNotEmpty) {
+        return;
+      }
 
-      // Update stock in feed_inventory
+      // Check stock in feed_inventory
       final items = await txn.query(
         'feed_inventory',
         where: 'id = ?',
@@ -693,8 +724,14 @@ class DatabaseHelper {
         if (tx.type == 'purchase') {
           newStock += tx.quantityKg;
         } else if (tx.type == 'consumption') {
+          if (newStock < tx.quantityKg) {
+            throw InsufficientFeedStockException(
+              availableStockKg: newStock,
+              requestedKg: tx.quantityKg,
+              feedName: item.name,
+            );
+          }
           newStock -= tx.quantityKg;
-          if (newStock < 0) newStock = 0;
         } else if (tx.type == 'adjustment') {
           newStock = tx.quantityKg;
         }
@@ -706,6 +743,12 @@ class DatabaseHelper {
           whereArgs: [item.id],
         );
       }
+
+      await txn.insert(
+        'feed_transactions',
+        tx.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
 
       // If purchase and cost > 0, record expense
       if (tx.type == 'purchase' && tx.cost > 0) {
@@ -800,8 +843,15 @@ class DatabaseHelper {
           newStock = (newStock - oldQuantityKg) + tx.quantityKg;
           if (newStock < 0) newStock = 0;
         } else if (tx.type == 'consumption') {
-          newStock = (newStock + oldQuantityKg) - tx.quantityKg;
-          if (newStock < 0) newStock = 0;
+          final available = newStock + oldQuantityKg;
+          if (available < tx.quantityKg) {
+            throw InsufficientFeedStockException(
+              availableStockKg: available,
+              requestedKg: tx.quantityKg,
+              feedName: item.name,
+            );
+          }
+          newStock = available - tx.quantityKg;
         }
         await txn.update(
           'feed_inventory',

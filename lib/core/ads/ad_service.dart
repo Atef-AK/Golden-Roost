@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AdService {
   static final AdService instance = AdService._internal();
@@ -16,23 +17,21 @@ class AdService {
   /// Initializes Mobile Ads SDK safely. Never crashes if offline or unsupported.
   Future<void> initialize() async {
     if (kIsWeb) {
-      // Mobile Ads SDK is Android/iOS native; web uses optional AdSense architecture
       _isInitialized = false;
       return;
     }
 
     try {
-      // In release builds with configured AdMob application ID, GoogleMobileAds.instance.initialize() is called.
-      // In development or when unconfigured, it gracefully falls back without blocking app startup.
+      await MobileAds.instance.initialize();
       _isInitialized = true;
     } catch (e) {
-      debugPrint('AdService initialization deferred: $e');
+      debugPrint('AdService initialization deferred or unavailable: $e');
       _isInitialized = false;
     }
   }
 
   /// Returns the appropriate banner ad unit ID.
-  /// Falls back to test ID in development or if production ID is not provided.
+  /// Falls back to official Google test ID in development or if production ID is not provided.
   String getBannerAdUnitId({String? productionAdUnitId}) {
     if (kReleaseMode &&
         productionAdUnitId != null &&
@@ -42,5 +41,28 @@ class AdService {
     return defaultTargetPlatform == TargetPlatform.iOS
         ? iosBannerTestId
         : androidBannerTestId;
+  }
+
+  /// Safely creates a real native BannerAd with lifecycle listeners
+  BannerAd? createBannerAd({
+    required void Function() onAdLoaded,
+    required void Function(LoadAdError error) onAdFailedToLoad,
+    String? productionAdUnitId,
+  }) {
+    if (!_isInitialized || kIsWeb) return null;
+
+    final adUnitId = getBannerAdUnitId(productionAdUnitId: productionAdUnitId);
+    return BannerAd(
+      adUnitId: adUnitId,
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (ad) => onAdLoaded(),
+        onAdFailedToLoad: (ad, error) {
+          ad.dispose();
+          onAdFailedToLoad(error);
+        },
+      ),
+    );
   }
 }

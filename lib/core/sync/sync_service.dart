@@ -78,6 +78,7 @@ class SyncService {
   Future<SyncResult> synchronize({
     bool isCloudConnected = false,
     Future<bool> Function(SyncItem item)? cloudAdapter,
+    Future<bool> Function(SyncTombstone tombstone)? cloudTombstoneAdapter,
   }) async {
     if (_currentStatus == SyncStatus.syncing) {
       return SyncResult(
@@ -102,7 +103,10 @@ class SyncService {
     }
 
     final pendingItems = await DatabaseHelper.instance.getPendingSyncItems();
-    if (pendingItems.isEmpty) {
+    final pendingTombstones =
+        await DatabaseHelper.instance.getPendingTombstones();
+
+    if (pendingItems.isEmpty && pendingTombstones.isEmpty) {
       _lastSyncTime = DateTime.now();
       _setStatus(SyncStatus.success);
       return const SyncResult(
@@ -116,52 +120,66 @@ class SyncService {
     int failedCount = 0;
     String? firstError;
 
-    for (final item in pendingItems) {
-      try {
-        bool uploaded = false;
-        if (cloudAdapter != null) {
-          uploaded = await cloudAdapter(item);
-        } else {
-          // Default mock/verified adapter
-          uploaded = true;
-        }
+    if (pendingItems.isNotEmpty && cloudAdapter == null) {
+      _setStatus(SyncStatus.error);
+      return const SyncResult(
+        syncedCount: 0,
+        failedCount: 0,
+        status: SyncStatus.error,
+        errorMessage:
+            'Cannot synchronize: No remote cloud adapter is configured. Outbox records preserved.',
+      );
+    }
 
-        if (uploaded) {
-          await DatabaseHelper.instance.deleteSyncItem(item.id);
-          syncedCount++;
-        } else {
+    if (cloudAdapter != null) {
+      for (final item in pendingItems) {
+        try {
+          final uploaded = await cloudAdapter(item);
+
+          if (uploaded) {
+            await DatabaseHelper.instance.deleteSyncItem(item.id);
+            syncedCount++;
+          } else {
+            failedCount++;
+            await DatabaseHelper.instance.updateSyncItem(
+              item.copyWith(
+                attempts: item.attempts + 1,
+                lastAttempt: DateTime.now(),
+                status: 'failed',
+                errorMessage: 'Upload rejected by cloud adapter',
+              ),
+            );
+          }
+        } catch (e) {
           failedCount++;
+          firstError ??= e.toString();
           await DatabaseHelper.instance.updateSyncItem(
             item.copyWith(
               attempts: item.attempts + 1,
               lastAttempt: DateTime.now(),
               status: 'failed',
-              errorMessage: 'Upload failed by cloud adapter',
+              errorMessage: e.toString(),
             ),
           );
         }
-      } catch (e) {
-        failedCount++;
-        firstError ??= e.toString();
-        await DatabaseHelper.instance.updateSyncItem(
-          item.copyWith(
-            attempts: item.attempts + 1,
-            lastAttempt: DateTime.now(),
-            status: 'failed',
-            errorMessage: e.toString(),
-          ),
-        );
       }
     }
 
-    // Process tombstones
-    final pendingTombstones =
-        await DatabaseHelper.instance.getPendingTombstones();
-    for (final tombstone in pendingTombstones) {
-      await DatabaseHelper.instance.markTombstoneSynced(
-        tombstone.tableName,
-        tombstone.recordId,
-      );
+    // Process tombstones only if a tombstone adapter is provided and confirms deletion
+    if (cloudTombstoneAdapter != null) {
+      for (final tombstone in pendingTombstones) {
+        try {
+          final tombstoneSynced = await cloudTombstoneAdapter(tombstone);
+          if (tombstoneSynced) {
+            await DatabaseHelper.instance.markTombstoneSynced(
+              tombstone.tableName,
+              tombstone.recordId,
+            );
+          }
+        } catch (_) {
+          // Keep tombstone pending on network error
+        }
+      }
     }
 
     _lastSyncTime = DateTime.now();

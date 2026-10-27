@@ -124,9 +124,32 @@ class FeedTransaction {
       date: DateTime.parse(map['date'] as String),
       type: map['type'] as String,
       quantityKg: (map['quantity_kg'] as num?)?.toDouble() ?? 0.0,
-      cost: (map['cost'] as num?)?.toDouble() ?? 0.0,
       notes: map['notes'] as String? ?? '',
       createdAt: DateTime.parse(map['created_at'] as String),
+    );
+  }
+
+  FeedTransaction copyWith({
+    String? id,
+    String? feedId,
+    String? flockId,
+    DateTime? date,
+    String? type,
+    double? quantityKg,
+    double? cost,
+    String? notes,
+    DateTime? createdAt,
+  }) {
+    return FeedTransaction(
+      id: id ?? this.id,
+      feedId: feedId ?? this.feedId,
+      flockId: flockId ?? this.flockId,
+      date: date ?? this.date,
+      type: type ?? this.type,
+      quantityKg: quantityKg ?? this.quantityKg,
+      cost: cost ?? this.cost,
+      notes: notes ?? this.notes,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 }

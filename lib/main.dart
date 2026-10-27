@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/ads/ad_service.dart';
 import 'core/localization/western_arabic_localizations.dart';
 import 'core/notifications/notification_service.dart';
 import 'core/theme/app_theme.dart';
@@ -13,6 +14,9 @@ void main() async {
 
   // Initialize background notifications
   await NotificationService.instance.init();
+
+  // Initialize Mobile Ads SDK safely (never crashes if offline)
+  await AdService.instance.initialize();
 
   runApp(const ProviderScope(child: GoldenRoostApp()));
 }

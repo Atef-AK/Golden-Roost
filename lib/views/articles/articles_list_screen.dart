@@ -134,35 +134,44 @@ class ArticlesListScreen extends ConsumerWidget {
 
             const SizedBox(height: 8),
 
-            // Articles List
+            // Articles List with Pull-to-Refresh
             Expanded(
-              child: articles.isEmpty
-                  ? EmptyStateView(
-                      icon: Icons.menu_book_outlined,
-                      title: 'No articles found',
-                      description:
-                          'Try adjusting your search query or category filter.',
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 80),
-                      itemCount: articles.length,
-                      itemBuilder: (ctx, index) {
-                        final article = articles[index];
-                        return _ArticleCard(
-                          article: article,
-                          langCode: langCode,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    ArticleDetailScreen(article: article),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    ),
+              child: RefreshIndicator(
+                onRefresh: () =>
+                    ref.read(articlesProvider.notifier).syncRemoteArticles(),
+                child: articles.isEmpty
+                    ? ListView(
+                        children: const [
+                          SizedBox(height: 60),
+                          EmptyStateView(
+                            icon: Icons.menu_book_outlined,
+                            title: 'No articles found',
+                            description:
+                                'Try adjusting your search query or category filter.',
+                          ),
+                        ],
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 80),
+                        itemCount: articles.length,
+                        itemBuilder: (ctx, index) {
+                          final article = articles[index];
+                          return _ArticleCard(
+                            article: article,
+                            langCode: langCode,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      ArticleDetailScreen(article: article),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+              ),
             ),
           ],
         ),

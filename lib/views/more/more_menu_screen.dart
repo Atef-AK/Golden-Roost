@@ -67,9 +67,9 @@ class MoreMenuScreen extends ConsumerWidget {
         route: '/products',
       ),
       _MoreTile(
-        title: 'Admin Console & CMS',
-        subtitle: 'Manage remote content, products & push campaigns',
-        icon: Icons.admin_panel_settings_outlined,
+        title: 'Admin Portal (Web)',
+        subtitle: 'Access content management & push campaigns',
+        icon: Icons.shield_outlined,
         color: AppColors.semanticWarning,
         route: '/admin',
       ),
