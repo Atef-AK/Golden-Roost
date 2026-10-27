@@ -25,7 +25,8 @@ export async function GET() {
     });
   } catch (err) {
     console.error('Failed to get monetization settings:', err);
-    return NextResponse.json({ error: 'Failed to get settings' }, { status: 500 });
+    const message = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ error: 'Failed to get settings', details: message }, { status: 500 });
   }
 }
 
