@@ -27,11 +27,13 @@ class FlocksNotifier extends StateNotifier<List<Flock>> {
     state = list;
   }
 
-  Future<void> addFlock(Flock flock) async {
+  Future<void> addFlock(Flock flock, {bool isInternalTransfer = false}) async {
     await DatabaseHelper.instance.insertFlock(flock);
 
-    // If purchase price > 0, record purchase expense
-    if (flock.totalPurchaseCost > 0) {
+    // If purchase price > 0 and not an internal transfer from own hatchery, record purchase expense
+    if (flock.totalPurchaseCost > 0 &&
+        !isInternalTransfer &&
+        !flock.id.startsWith('flock_hatched_')) {
       await DatabaseHelper.instance.insertFinance(
         FinancialTransaction(
           id: 'fin_flock_init_${flock.id}',

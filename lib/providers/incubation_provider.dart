@@ -56,20 +56,24 @@ class IncubationBatchesNotifier extends StateNotifier<List<IncubationBatch>> {
     required String newFlockName,
     required String housingLocation,
   }) async {
-    if (batch.hatchedCount <= 0) return;
+    if (batch.hatchedCount <= 0 || batch.isTransferred) return;
 
     final costPerChick = batch.costPerChick;
     final now = DateTime.now();
+    final flockId = 'flock_hatched_${batch.id}';
 
     final newFlock = Flock(
-      id: 'flock_hatched_${batch.id}',
+      id: flockId,
       name: newFlockName,
       species: batch.species,
       breed: '${batch.species} (Hatched in ${batch.incubatorName})',
       purpose: 'mixed',
       acquisitionDate: now,
+      hatchDate: batch.expectedHatchDate,
       startCount: batch.hatchedCount,
       currentCount: batch.hatchedCount,
+      startMaleCount: 0,
+      startFemaleCount: 0,
       maleCount: 0,
       femaleCount: 0,
       purchasePricePerBird: costPerChick,
@@ -81,11 +85,15 @@ class IncubationBatchesNotifier extends StateNotifier<List<IncubationBatch>> {
       createdAt: now,
     );
 
-    // Save flock
-    await ref.read(flocksProvider.notifier).addFlock(newFlock);
+    // Save flock as internal transfer without duplicate expense
+    await ref.read(flocksProvider.notifier).addFlock(newFlock, isInternalTransfer: true);
 
-    // Mark batch as completed
-    final updatedBatch = batch.copyWith(status: 'completed');
+    // Mark batch as completed and transferred
+    final updatedBatch = batch.copyWith(
+      status: 'completed',
+      isTransferred: true,
+      transferredFlockId: flockId,
+    );
     await updateBatch(updatedBatch);
   }
 }

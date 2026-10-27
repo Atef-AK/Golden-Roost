@@ -8,6 +8,8 @@ class Flock {
   final DateTime? hatchDate;
   final int startCount;
   final int currentCount;
+  final int startMaleCount;
+  final int startFemaleCount;
   final int maleCount;
   final int femaleCount;
   final double purchasePricePerBird;
@@ -28,6 +30,8 @@ class Flock {
     this.hatchDate,
     required this.startCount,
     required this.currentCount,
+    int? startMaleCount,
+    int? startFemaleCount,
     this.maleCount = 0,
     this.femaleCount = 0,
     this.purchasePricePerBird = 0.0,
@@ -37,9 +41,25 @@ class Flock {
     this.notes = '',
     this.isArchived = false,
     required this.createdAt,
-  });
+  })  : startMaleCount = startMaleCount ?? maleCount,
+        startFemaleCount = startFemaleCount ?? femaleCount;
 
   DateTime get effectiveBirthDate => hatchDate ?? acquisitionDate;
+
+  int get unknownSexCount =>
+      (currentCount - (maleCount + femaleCount)).clamp(0, currentCount);
+
+  /// Females at or past maturity (~18 weeks for chickens, ~6 weeks for quail) capable of laying
+  int get eligibleLayingFemales {
+    final pur = purpose.toLowerCase().trim();
+    if (pur.contains('meat') || pur.contains('broiler') || pur.contains('chair')) {
+      return 0;
+    }
+    final sp = species.toLowerCase().trim();
+    final minLayingWeeks = (sp.contains('quail') || sp.contains('caille')) ? 6 : 18;
+    if (ageInWeeks < minLayingWeeks) return 0;
+    return femaleCount;
+  }
 
   int get ageInDays {
     return DateTime.now().difference(effectiveBirthDate).inDays.clamp(0, 99999);
@@ -61,6 +81,8 @@ class Flock {
     DateTime? hatchDate,
     int? startCount,
     int? currentCount,
+    int? startMaleCount,
+    int? startFemaleCount,
     int? maleCount,
     int? femaleCount,
     double? purchasePricePerBird,
@@ -81,6 +103,8 @@ class Flock {
       hatchDate: hatchDate ?? this.hatchDate,
       startCount: startCount ?? this.startCount,
       currentCount: currentCount ?? this.currentCount,
+      startMaleCount: startMaleCount ?? this.startMaleCount,
+      startFemaleCount: startFemaleCount ?? this.startFemaleCount,
       maleCount: maleCount ?? this.maleCount,
       femaleCount: femaleCount ?? this.femaleCount,
       purchasePricePerBird: purchasePricePerBird ?? this.purchasePricePerBird,
@@ -104,6 +128,8 @@ class Flock {
       'hatch_date': hatchDate?.toIso8601String(),
       'start_count': startCount,
       'current_count': currentCount,
+      'start_male_count': startMaleCount,
+      'start_female_count': startFemaleCount,
       'male_count': maleCount,
       'female_count': femaleCount,
       'purchase_price_per_bird': purchasePricePerBird,
@@ -117,6 +143,8 @@ class Flock {
   }
 
   factory Flock.fromMap(Map<String, dynamic> map) {
+    final male = map['male_count'] as int? ?? 0;
+    final female = map['female_count'] as int? ?? 0;
     return Flock(
       id: map['id'] as String,
       name: map['name'] as String,
@@ -129,8 +157,10 @@ class Flock {
           : null,
       startCount: map['start_count'] as int? ?? 0,
       currentCount: map['current_count'] as int? ?? 0,
-      maleCount: map['male_count'] as int? ?? 0,
-      femaleCount: map['female_count'] as int? ?? 0,
+      startMaleCount: map['start_male_count'] as int? ?? male,
+      startFemaleCount: map['start_female_count'] as int? ?? female,
+      maleCount: male,
+      femaleCount: female,
       purchasePricePerBird:
           (map['purchase_price_per_bird'] as num?)?.toDouble() ?? 0.0,
       totalPurchaseCost:

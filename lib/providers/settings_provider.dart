@@ -65,4 +65,40 @@ class SettingsNotifier extends StateNotifier<FarmSettings> {
     await DatabaseHelper.instance.updateSettings(updated);
     state = updated;
   }
+
+  Future<void> toggleAutoFeedDeduction(bool enabled) async {
+    final updated = state.copyWith(autoFeedDeduction: enabled);
+    await DatabaseHelper.instance.updateSettings(updated);
+    state = updated;
+  }
+
+  Future<void> toggleArticleNotifications(bool enabled) async {
+    final updated = state.copyWith(articleNotificationsEnabled: enabled);
+    await DatabaseHelper.instance.updateSettings(updated);
+    state = updated;
+  }
+
+  Future<void> toggleMarketingNotifications(bool enabled) async {
+    final updated = state.copyWith(marketingNotificationsEnabled: enabled);
+    await DatabaseHelper.instance.updateSettings(updated);
+    state = updated;
+  }
+
+  Future<void> toggleAds(bool enabled) async {
+    final updated = state.copyWith(adsEnabled: enabled);
+    await DatabaseHelper.instance.updateSettings(updated);
+    state = updated;
+  }
+
+  Future<void> toggleCloudSync(bool enabled) async {
+    final updated = state.copyWith(cloudSyncEnabled: enabled);
+    await DatabaseHelper.instance.updateSettings(updated);
+    state = updated;
+  }
+
+  Future<void> updateLastSyncTimestamp(DateTime timestamp) async {
+    final updated = state.copyWith(lastSyncTimestamp: timestamp);
+    await DatabaseHelper.instance.updateSettings(updated);
+    state = updated;
+  }
 }

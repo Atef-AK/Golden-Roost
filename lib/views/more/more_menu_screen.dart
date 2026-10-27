@@ -53,6 +53,27 @@ class MoreMenuScreen extends ConsumerWidget {
         route: '/finance/electricity',
       ),
       _MoreTile(
+        title: 'Articles & Vet Care',
+        subtitle: 'Brooding, vaccination, and flock health guides',
+        icon: Icons.menu_book_outlined,
+        color: AppColors.primaryTeal,
+        route: '/articles',
+      ),
+      _MoreTile(
+        title: 'Equipment & Supplies',
+        subtitle: 'Verified incubators, brooders, candlers & gear',
+        icon: Icons.storefront_outlined,
+        color: AppColors.primaryTeal,
+        route: '/products',
+      ),
+      _MoreTile(
+        title: 'Admin Console & CMS',
+        subtitle: 'Manage remote content, products & push campaigns',
+        icon: Icons.admin_panel_settings_outlined,
+        color: AppColors.semanticWarning,
+        route: '/admin',
+      ),
+      _MoreTile(
         title: context.tr('settings_title'),
         subtitle: context.tr('more_settings_sub'),
         icon: Icons.settings_outlined,

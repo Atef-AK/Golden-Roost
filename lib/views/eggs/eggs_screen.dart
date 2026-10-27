@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import '../../core/localization/app_translations.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/responsive.dart';
+import '../../core/utils/calculations.dart';
 import '../../core/utils/formatters.dart';
 import '../../models/egg_record.dart';
 import '../../providers/egg_provider.dart';
@@ -46,9 +47,14 @@ class _EggsScreenState extends ConsumerState<EggsScreen>
     final totalCollected = logs.fold(0, (sum, l) => sum + l.totalEggs);
     final totalUsable = logs.fold(0, (sum, l) => sum + l.usableEggs);
     final totalCracked = logs.fold(0, (sum, l) => sum + l.crackedEggs);
+    final totalIncubation = logs.fold(0, (sum, l) => sum + l.keptForIncubation);
     final totalSold = sales.fold(0, (sum, s) => sum + s.quantity);
     final totalRevenue = sales.fold(0.0, (sum, s) => sum + s.totalAmount);
-    final eggStock = totalUsable - totalSold;
+    final availableSaleable = FarmCalculations.calculateAvailableSaleableEggs(
+      totalUsableEggs: totalUsable,
+      reservedForIncubation: totalIncubation,
+      totalSold: totalSold,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -109,7 +115,7 @@ class _EggsScreenState extends ConsumerState<EggsScreen>
                       ),
                       _EggKpiCard(
                         label: context.tr('eggs_available_stock_kpi'),
-                        value: (eggStock < 0 ? 0 : eggStock).toString(),
+                        value: availableSaleable.toString(),
                         icon: Icons.inventory_2_outlined,
                         color: AppColors.semanticSuccess,
                       ),
@@ -440,6 +446,17 @@ class _EggsScreenState extends ConsumerState<EggsScreen>
 
   void _showSellEggsDialog(BuildContext context) {
     final currency = ref.read(settingsProvider).currency;
+    final logs = ref.read(eggLogsProvider);
+    final sales = ref.read(eggSalesProvider);
+    final totalUsable = logs.fold(0, (sum, l) => sum + l.usableEggs);
+    final totalSold = sales.fold(0, (sum, s) => sum + s.quantity);
+    final totalIncubation = logs.fold(0, (sum, l) => sum + l.keptForIncubation);
+    final availableSaleable = FarmCalculations.calculateAvailableSaleableEggs(
+      totalUsableEggs: totalUsable,
+      reservedForIncubation: totalIncubation,
+      totalSold: totalSold,
+    );
+
     final qtyCtrl = TextEditingController();
     final priceCtrl = TextEditingController(text: '0.350');
     final buyerCtrl = TextEditingController();
@@ -485,6 +502,7 @@ class _EggsScreenState extends ConsumerState<EggsScreen>
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     labelText: context.tr('eggs_sell_qty'),
+                    helperText: '${context.tr('eggs_available_stock_kpi')}: $availableSaleable',
                     prefixIcon: const Icon(Icons.egg),
                   ),
                 ),
@@ -546,6 +564,18 @@ class _EggsScreenState extends ConsumerState<EggsScreen>
                 final qty = int.tryParse(qtyCtrl.text) ?? 0;
                 final price = double.tryParse(priceCtrl.text) ?? 0.0;
                 if (qty <= 0) return;
+
+                if (qty > availableSaleable) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        '${context.tr('eggs_oversell_warning')} ($availableSaleable ${context.tr('eggs_total')})',
+                      ),
+                      backgroundColor: AppColors.semanticError,
+                    ),
+                  );
+                  return;
+                }
 
                 final total = qty * price;
                 final sale = EggSale(

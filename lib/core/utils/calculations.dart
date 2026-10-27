@@ -9,13 +9,45 @@ class FarmCalculations {
     return result < 0 ? 0 : result;
   }
 
-  /// Calculate egg laying percentage: (eggs / female birds) * 100
+  /// Calculate egg laying percentage based on eligible mature female layers
   static double calculateLayingRate({
     required int eggsCollected,
     required int femaleBirds,
   }) {
     if (femaleBirds <= 0 || eggsCollected <= 0) return 0.0;
     return (eggsCollected / femaleBirds) * 100.0;
+  }
+
+  /// Calculates available saleable egg inventory ensuring reserved incubation eggs
+  /// and previously sold eggs cannot be double sold.
+  static int calculateAvailableSaleableEggs({
+    required int totalUsableEggs,
+    required int reservedForIncubation,
+    required int totalSold,
+  }) {
+    final available = totalUsableEggs - reservedForIncubation - totalSold;
+    return available < 0 ? 0 : available;
+  }
+
+  /// Cost per egg: production cost / usable eggs produced
+  static double calculateCostPerEgg({
+    required double totalProductionCost,
+    required int totalUsableEggs,
+  }) {
+    if (totalUsableEggs <= 0 || totalProductionCost <= 0) return 0.0;
+    return totalProductionCost / totalUsableEggs;
+  }
+
+  /// Cost per dozen eggs
+  static double calculateCostPerDozenEggs({
+    required double totalProductionCost,
+    required int totalUsableEggs,
+  }) {
+    return calculateCostPerEgg(
+          totalProductionCost: totalProductionCost,
+          totalUsableEggs: totalUsableEggs,
+        ) *
+        12.0;
   }
 
   /// Calculate daily feed consumed per bird in grams: (feedKg * 1000) / birdCount

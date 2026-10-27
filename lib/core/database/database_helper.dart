@@ -15,6 +15,10 @@ import '../../models/vaccination.dart';
 import '../../models/health_record.dart';
 import '../../models/finance.dart';
 import '../../models/electricity.dart';
+import '../../models/article.dart';
+import '../../models/poultry_product.dart';
+import '../../models/sync_item.dart';
+import '../../models/notification_campaign.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -64,7 +68,7 @@ class DatabaseHelper {
 
     final db = await openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: _createDB,
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -79,6 +83,40 @@ class DatabaseHelper {
             await db.execute("ALTER TABLE flocks ADD COLUMN hatch_date TEXT;");
           } catch (_) {}
         }
+        if (oldVersion < 4) {
+          try {
+            await db.execute("ALTER TABLE farm_settings ADD COLUMN auto_feed_deduction INTEGER NOT NULL DEFAULT 0;");
+          } catch (_) {}
+          try {
+            await db.execute("ALTER TABLE farm_settings ADD COLUMN article_notifications_enabled INTEGER NOT NULL DEFAULT 1;");
+          } catch (_) {}
+          try {
+            await db.execute("ALTER TABLE farm_settings ADD COLUMN marketing_notifications_enabled INTEGER NOT NULL DEFAULT 0;");
+          } catch (_) {}
+          try {
+            await db.execute("ALTER TABLE farm_settings ADD COLUMN ads_enabled INTEGER NOT NULL DEFAULT 1;");
+          } catch (_) {}
+          try {
+            await db.execute("ALTER TABLE farm_settings ADD COLUMN cloud_sync_enabled INTEGER NOT NULL DEFAULT 0;");
+          } catch (_) {}
+          try {
+            await db.execute("ALTER TABLE farm_settings ADD COLUMN last_sync_timestamp TEXT;");
+          } catch (_) {}
+          try {
+            await db.execute("ALTER TABLE flocks ADD COLUMN start_male_count INTEGER NOT NULL DEFAULT 0;");
+          } catch (_) {}
+          try {
+            await db.execute("ALTER TABLE flocks ADD COLUMN start_female_count INTEGER NOT NULL DEFAULT 0;");
+          } catch (_) {}
+          try {
+            await db.execute("ALTER TABLE incubation_batches ADD COLUMN is_transferred INTEGER NOT NULL DEFAULT 0;");
+          } catch (_) {}
+          try {
+            await db.execute("ALTER TABLE incubation_batches ADD COLUMN transferred_flock_id TEXT;");
+          } catch (_) {}
+
+          await _createSyncAndContentTables(db);
+        }
       },
     );
 
@@ -86,6 +124,38 @@ class DatabaseHelper {
     try {
       await db.execute("ALTER TABLE flocks ADD COLUMN hatch_date TEXT;");
     } catch (_) {}
+    try {
+      await db.execute("ALTER TABLE farm_settings ADD COLUMN auto_feed_deduction INTEGER NOT NULL DEFAULT 0;");
+    } catch (_) {}
+    try {
+      await db.execute("ALTER TABLE farm_settings ADD COLUMN article_notifications_enabled INTEGER NOT NULL DEFAULT 1;");
+    } catch (_) {}
+    try {
+      await db.execute("ALTER TABLE farm_settings ADD COLUMN marketing_notifications_enabled INTEGER NOT NULL DEFAULT 0;");
+    } catch (_) {}
+    try {
+      await db.execute("ALTER TABLE farm_settings ADD COLUMN ads_enabled INTEGER NOT NULL DEFAULT 1;");
+    } catch (_) {}
+    try {
+      await db.execute("ALTER TABLE farm_settings ADD COLUMN cloud_sync_enabled INTEGER NOT NULL DEFAULT 0;");
+    } catch (_) {}
+    try {
+      await db.execute("ALTER TABLE farm_settings ADD COLUMN last_sync_timestamp TEXT;");
+    } catch (_) {}
+    try {
+      await db.execute("ALTER TABLE flocks ADD COLUMN start_male_count INTEGER NOT NULL DEFAULT 0;");
+    } catch (_) {}
+    try {
+      await db.execute("ALTER TABLE flocks ADD COLUMN start_female_count INTEGER NOT NULL DEFAULT 0;");
+    } catch (_) {}
+    try {
+      await db.execute("ALTER TABLE incubation_batches ADD COLUMN is_transferred INTEGER NOT NULL DEFAULT 0;");
+    } catch (_) {}
+    try {
+      await db.execute("ALTER TABLE incubation_batches ADD COLUMN transferred_flock_id TEXT;");
+    } catch (_) {}
+
+    await _createSyncAndContentTables(db);
 
     return db;
   }
@@ -460,15 +530,15 @@ class DatabaseHelper {
     await db.delete('flocks', where: 'id = ?', whereArgs: [id]);
   }
 
-  // Recalculates live bird count based on starting count and all bird movements
+  // Recalculates live bird count deterministically based on starting counts and all bird movements
   Future<int> recalculateFlockCount(String flockId) async {
     final flock = await getFlockById(flockId);
     if (flock == null) return 0;
 
     final movements = await getBirdMovements(flockId);
     int count = flock.startCount;
-    int males = flock.maleCount;
-    int females = flock.femaleCount;
+    int males = flock.startMaleCount;
+    int females = flock.startFemaleCount;
 
     for (final m in movements) {
       if (m.isAddition) {
@@ -485,6 +555,11 @@ class DatabaseHelper {
     if (count < 0) count = 0;
     if (males < 0) males = 0;
     if (females < 0) females = 0;
+    if (males > count) males = count;
+    if (females > count) females = count;
+    if (males + females > count) {
+      females = (count - males).clamp(0, count);
+    }
 
     final updated = flock.copyWith(
       currentCount: count,
@@ -599,35 +674,42 @@ class DatabaseHelper {
 
   Future<void> recordFeedTransaction(FeedTransaction tx) async {
     final db = await database;
-    await db.insert('feed_transactions', tx.toMap());
+    await db.transaction((txn) async {
+      await txn.insert(
+        'feed_transactions',
+        tx.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
 
-    // Update stock in feed_inventory
-    final items = await db.query(
-      'feed_inventory',
-      where: 'id = ?',
-      whereArgs: [tx.feedId],
-    );
-    if (items.isNotEmpty) {
-      final item = FeedItem.fromMap(items.first);
-      double newStock = item.currentStockKg;
-      if (tx.type == 'purchase') {
-        newStock += tx.quantityKg;
-      } else if (tx.type == 'consumption') {
-        newStock -= tx.quantityKg;
-        if (newStock < 0) newStock = 0;
-      } else if (tx.type == 'adjustment') {
-        newStock = tx.quantityKg;
+      // Update stock in feed_inventory
+      final items = await txn.query(
+        'feed_inventory',
+        where: 'id = ?',
+        whereArgs: [tx.feedId],
+      );
+      if (items.isNotEmpty) {
+        final item = FeedItem.fromMap(items.first);
+        double newStock = item.currentStockKg;
+        if (tx.type == 'purchase') {
+          newStock += tx.quantityKg;
+        } else if (tx.type == 'consumption') {
+          newStock -= tx.quantityKg;
+          if (newStock < 0) newStock = 0;
+        } else if (tx.type == 'adjustment') {
+          newStock = tx.quantityKg;
+        }
+
+        await txn.update(
+          'feed_inventory',
+          item.copyWith(currentStockKg: newStock, updatedAt: DateTime.now()).toMap(),
+          where: 'id = ?',
+          whereArgs: [item.id],
+        );
       }
 
-      await updateFeedItem(
-        item.copyWith(currentStockKg: newStock, updatedAt: DateTime.now()),
-      );
-    }
-
-    // If purchase and cost > 0, record expense
-    if (tx.type == 'purchase' && tx.cost > 0) {
-      await insertFinance(
-        FinancialTransaction(
+      // If purchase and cost > 0, record expense
+      if (tx.type == 'purchase' && tx.cost > 0) {
+        final finance = FinancialTransaction(
           id: 'fin_feed_${tx.id}',
           type: 'expense',
           category: 'feed',
@@ -638,47 +720,57 @@ class DatabaseHelper {
           amountPaid: tx.cost,
           notes: 'Feed restock: ${tx.quantityKg} kg',
           createdAt: DateTime.now(),
-        ),
-      );
-    }
+        );
+        await txn.insert(
+          'finances',
+          finance.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+    });
   }
 
   Future<void> deleteFeedTransaction(String txId) async {
     final db = await database;
-    final results = await db.query(
-      'feed_transactions',
-      where: 'id = ?',
-      whereArgs: [txId],
-    );
-    if (results.isEmpty) return;
-
-    final tx = FeedTransaction.fromMap(results.first);
-
-    // Reverse stock in feed_inventory
-    final items = await db.query(
-      'feed_inventory',
-      where: 'id = ?',
-      whereArgs: [tx.feedId],
-    );
-    if (items.isNotEmpty) {
-      final item = FeedItem.fromMap(items.first);
-      double newStock = item.currentStockKg;
-      if (tx.type == 'purchase') {
-        newStock -= tx.quantityKg;
-        if (newStock < 0) newStock = 0;
-      } else if (tx.type == 'consumption') {
-        newStock += tx.quantityKg;
-      }
-      await updateFeedItem(
-        item.copyWith(currentStockKg: newStock, updatedAt: DateTime.now()),
+    await db.transaction((txn) async {
+      final results = await txn.query(
+        'feed_transactions',
+        where: 'id = ?',
+        whereArgs: [txId],
       );
-    }
+      if (results.isEmpty) return;
 
-    // Delete associated financial expense if purchase
-    await db.delete('finances', where: 'id = ?', whereArgs: ['fin_feed_$txId']);
+      final tx = FeedTransaction.fromMap(results.first);
 
-    // Delete from feed_transactions
-    await db.delete('feed_transactions', where: 'id = ?', whereArgs: [txId]);
+      // Reverse stock in feed_inventory
+      final items = await txn.query(
+        'feed_inventory',
+        where: 'id = ?',
+        whereArgs: [tx.feedId],
+      );
+      if (items.isNotEmpty) {
+        final item = FeedItem.fromMap(items.first);
+        double newStock = item.currentStockKg;
+        if (tx.type == 'purchase') {
+          newStock -= tx.quantityKg;
+          if (newStock < 0) newStock = 0;
+        } else if (tx.type == 'consumption') {
+          newStock += tx.quantityKg;
+        }
+        await txn.update(
+          'feed_inventory',
+          item.copyWith(currentStockKg: newStock, updatedAt: DateTime.now()).toMap(),
+          where: 'id = ?',
+          whereArgs: [item.id],
+        );
+      }
+
+      // Delete associated financial expense if purchase
+      await txn.delete('finances', where: 'id = ?', whereArgs: ['fin_feed_$txId']);
+
+      // Delete from feed_transactions
+      await txn.delete('feed_transactions', where: 'id = ?', whereArgs: [txId]);
+    });
   }
 
   Future<void> updateFeedTransaction(
@@ -687,39 +779,42 @@ class DatabaseHelper {
     double oldCost,
   ) async {
     final db = await database;
-    await db.update(
-      'feed_transactions',
-      tx.toMap(),
-      where: 'id = ?',
-      whereArgs: [tx.id],
-    );
-
-    // Adjust stock in feed_inventory
-    final items = await db.query(
-      'feed_inventory',
-      where: 'id = ?',
-      whereArgs: [tx.feedId],
-    );
-    if (items.isNotEmpty) {
-      final item = FeedItem.fromMap(items.first);
-      double newStock = item.currentStockKg;
-      if (tx.type == 'purchase') {
-        newStock = (newStock - oldQuantityKg) + tx.quantityKg;
-        if (newStock < 0) newStock = 0;
-      } else if (tx.type == 'consumption') {
-        newStock = (newStock + oldQuantityKg) - tx.quantityKg;
-        if (newStock < 0) newStock = 0;
-      }
-      await updateFeedItem(
-        item.copyWith(currentStockKg: newStock, updatedAt: DateTime.now()),
+    await db.transaction((txn) async {
+      await txn.update(
+        'feed_transactions',
+        tx.toMap(),
+        where: 'id = ?',
+        whereArgs: [tx.id],
       );
-    }
 
-    // Update associated finance if purchase
-    if (tx.type == 'purchase') {
-      if (tx.cost > 0) {
-        await insertFinance(
-          FinancialTransaction(
+      // Adjust stock in feed_inventory
+      final items = await txn.query(
+        'feed_inventory',
+        where: 'id = ?',
+        whereArgs: [tx.feedId],
+      );
+      if (items.isNotEmpty) {
+        final item = FeedItem.fromMap(items.first);
+        double newStock = item.currentStockKg;
+        if (tx.type == 'purchase') {
+          newStock = (newStock - oldQuantityKg) + tx.quantityKg;
+          if (newStock < 0) newStock = 0;
+        } else if (tx.type == 'consumption') {
+          newStock = (newStock + oldQuantityKg) - tx.quantityKg;
+          if (newStock < 0) newStock = 0;
+        }
+        await txn.update(
+          'feed_inventory',
+          item.copyWith(currentStockKg: newStock, updatedAt: DateTime.now()).toMap(),
+          where: 'id = ?',
+          whereArgs: [item.id],
+        );
+      }
+
+      // Update associated finance if purchase
+      if (tx.type == 'purchase') {
+        if (tx.cost > 0) {
+          final finance = FinancialTransaction(
             id: 'fin_feed_${tx.id}',
             type: 'expense',
             category: 'feed',
@@ -730,16 +825,21 @@ class DatabaseHelper {
             amountPaid: tx.cost,
             notes: 'Feed restock: ${tx.quantityKg} kg',
             createdAt: DateTime.now(),
-          ),
-        );
-      } else {
-        await db.delete(
-          'finances',
-          where: 'id = ?',
-          whereArgs: ['fin_feed_${tx.id}'],
-        );
+          );
+          await txn.insert(
+            'finances',
+            finance.toMap(),
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
+        } else {
+          await txn.delete(
+            'finances',
+            where: 'id = ?',
+            whereArgs: ['fin_feed_${tx.id}'],
+          );
+        }
       }
-    }
+    });
   }
 
   // Water & Care Logs
@@ -1338,6 +1438,352 @@ class DatabaseHelper {
       await txn.delete('feed_inventory');
       await txn.delete('bird_movements');
       await txn.delete('flocks');
+      await txn.delete('sync_outbox');
+      await txn.delete('sync_tombstones');
     });
+  }
+
+  // ==================== Sync and Content Tables ====================
+  Future<void> _createSyncAndContentTables(DatabaseExecutor db) async {
+    // Sync Outbox Table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS sync_outbox (
+        id TEXT PRIMARY KEY,
+        table_name TEXT NOT NULL,
+        record_id TEXT NOT NULL,
+        action TEXT NOT NULL,
+        payload TEXT NOT NULL,
+        idempotency_key TEXT UNIQUE NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        attempts INTEGER NOT NULL DEFAULT 0,
+        last_attempt TEXT,
+        error_message TEXT,
+        created_at TEXT NOT NULL
+      )
+    ''');
+
+    // Sync Tombstones Table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS sync_tombstones (
+        table_name TEXT NOT NULL,
+        record_id TEXT NOT NULL,
+        deleted_at TEXT NOT NULL,
+        synced INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (table_name, record_id)
+      )
+    ''');
+
+    // Articles Table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS articles (
+        id TEXT PRIMARY KEY,
+        slug TEXT UNIQUE NOT NULL,
+        title_en TEXT NOT NULL,
+        title_fr TEXT NOT NULL,
+        title_ar TEXT NOT NULL,
+        summary_en TEXT NOT NULL,
+        summary_fr TEXT NOT NULL,
+        summary_ar TEXT NOT NULL,
+        body_en TEXT NOT NULL,
+        body_fr TEXT NOT NULL,
+        body_ar TEXT NOT NULL,
+        category TEXT NOT NULL,
+        tags TEXT NOT NULL DEFAULT '',
+        image_url TEXT,
+        author TEXT NOT NULL,
+        reviewer TEXT,
+        reading_time_minutes INTEGER NOT NULL DEFAULT 5,
+        references_text TEXT,
+        disclaimer TEXT,
+        is_published INTEGER NOT NULL DEFAULT 1,
+        is_featured INTEGER NOT NULL DEFAULT 0,
+        published_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      )
+    ''');
+
+    // Poultry Products Table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS poultry_products (
+        id TEXT PRIMARY KEY,
+        category TEXT NOT NULL,
+        name_en TEXT NOT NULL,
+        name_fr TEXT NOT NULL,
+        name_ar TEXT NOT NULL,
+        description_en TEXT NOT NULL,
+        description_fr TEXT NOT NULL,
+        description_ar TEXT NOT NULL,
+        image_url TEXT,
+        merchant_name TEXT NOT NULL,
+        price REAL NOT NULL DEFAULT 0.0,
+        currency TEXT NOT NULL DEFAULT 'USD',
+        price_verified_date TEXT,
+        target_url TEXT NOT NULL,
+        affiliate_url TEXT,
+        commercial_disclosure TEXT NOT NULL,
+        is_featured INTEGER NOT NULL DEFAULT 0,
+        is_active INTEGER NOT NULL DEFAULT 1,
+        display_order INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL
+      )
+    ''');
+
+    // Notification Campaigns Table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS notification_campaigns (
+        id TEXT PRIMARY KEY,
+        title_en TEXT NOT NULL,
+        title_fr TEXT NOT NULL,
+        title_ar TEXT NOT NULL,
+        body_en TEXT NOT NULL,
+        body_fr TEXT NOT NULL,
+        body_ar TEXT NOT NULL,
+        campaign_type TEXT NOT NULL,
+        destination_type TEXT NOT NULL,
+        destination_id TEXT,
+        audience_filter TEXT NOT NULL DEFAULT 'all',
+        status TEXT NOT NULL DEFAULT 'draft',
+        sent_count INTEGER NOT NULL DEFAULT 0,
+        scheduled_at TEXT,
+        sent_at TEXT,
+        created_at TEXT NOT NULL
+      )
+    ''');
+
+    // Admin Audit Logs Table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS admin_audit_logs (
+        id TEXT PRIMARY KEY,
+        action TEXT NOT NULL,
+        entity_type TEXT NOT NULL,
+        entity_id TEXT NOT NULL,
+        performed_by TEXT NOT NULL,
+        timestamp TEXT NOT NULL,
+        details TEXT
+      )
+    ''');
+  }
+
+  // ==================== Articles CRUD ====================
+  Future<List<Article>> getArticles({String? category, bool? onlyPublished}) async {
+    final db = await database;
+    String? where;
+    List<dynamic>? whereArgs;
+
+    if (category != null && onlyPublished == true) {
+      where = 'category = ? AND is_published = 1';
+      whereArgs = [category];
+    } else if (category != null) {
+      where = 'category = ?';
+      whereArgs = [category];
+    } else if (onlyPublished == true) {
+      where = 'is_published = 1';
+    }
+
+    final maps = await db.query(
+      'articles',
+      where: where,
+      whereArgs: whereArgs,
+      orderBy: 'is_featured DESC, published_at DESC',
+    );
+    return maps.map((m) => Article.fromMap(m)).toList();
+  }
+
+  Future<Article?> getArticleById(String id) async {
+    final db = await database;
+    final maps = await db.query('articles', where: 'id = ?', whereArgs: [id]);
+    if (maps.isEmpty) return null;
+    return Article.fromMap(maps.first);
+  }
+
+  Future<Article?> getArticleBySlug(String slug) async {
+    final db = await database;
+    final maps = await db.query('articles', where: 'slug = ?', whereArgs: [slug]);
+    if (maps.isEmpty) return null;
+    return Article.fromMap(maps.first);
+  }
+
+  Future<void> insertArticle(Article article) async {
+    final db = await database;
+    await db.insert('articles', article.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<void> updateArticle(Article article) async {
+    final db = await database;
+    await db.update('articles', article.toMap(), where: 'id = ?', whereArgs: [article.id]);
+  }
+
+  Future<void> deleteArticle(String id) async {
+    final db = await database;
+    await db.delete('articles', where: 'id = ?', whereArgs: [id]);
+  }
+
+  // ==================== Poultry Products CRUD ====================
+  Future<List<PoultryProduct>> getPoultryProducts({String? category, bool? onlyActive}) async {
+    final db = await database;
+    String? where;
+    List<dynamic>? whereArgs;
+
+    if (category != null && onlyActive == true) {
+      where = 'category = ? AND is_active = 1';
+      whereArgs = [category];
+    } else if (category != null) {
+      where = 'category = ?';
+      whereArgs = [category];
+    } else if (onlyActive == true) {
+      where = 'is_active = 1';
+    }
+
+    final maps = await db.query(
+      'poultry_products',
+      where: where,
+      whereArgs: whereArgs,
+      orderBy: 'is_featured DESC, display_order ASC, created_at DESC',
+    );
+    return maps.map((m) => PoultryProduct.fromMap(m)).toList();
+  }
+
+  Future<PoultryProduct?> getPoultryProductById(String id) async {
+    final db = await database;
+    final maps = await db.query('poultry_products', where: 'id = ?', whereArgs: [id]);
+    if (maps.isEmpty) return null;
+    return PoultryProduct.fromMap(maps.first);
+  }
+
+  Future<void> insertPoultryProduct(PoultryProduct product) async {
+    final db = await database;
+    await db.insert('poultry_products', product.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<void> updatePoultryProduct(PoultryProduct product) async {
+    final db = await database;
+    await db.update('poultry_products', product.toMap(), where: 'id = ?', whereArgs: [product.id]);
+  }
+
+  Future<void> deletePoultryProduct(String id) async {
+    final db = await database;
+    await db.delete('poultry_products', where: 'id = ?', whereArgs: [id]);
+  }
+
+  // ==================== Sync Outbox & Tombstones ====================
+  Future<List<SyncItem>> getPendingSyncItems() async {
+    final db = await database;
+    final maps = await db.query(
+      'sync_outbox',
+      where: "status = 'pending' OR status = 'failed'",
+      orderBy: 'created_at ASC',
+    );
+    return maps.map((m) => SyncItem.fromMap(m)).toList();
+  }
+
+  Future<void> queueSyncItem(SyncItem item) async {
+    final db = await database;
+    await db.insert(
+      'sync_outbox',
+      item.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> updateSyncItem(SyncItem item) async {
+    final db = await database;
+    await db.update(
+      'sync_outbox',
+      item.toMap(),
+      where: 'id = ?',
+      whereArgs: [item.id],
+    );
+  }
+
+  Future<void> deleteSyncItem(String id) async {
+    final db = await database;
+    await db.delete('sync_outbox', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<void> recordTombstone(SyncTombstone tombstone) async {
+    final db = await database;
+    await db.insert(
+      'sync_tombstones',
+      tombstone.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<List<SyncTombstone>> getPendingTombstones() async {
+    final db = await database;
+    final maps = await db.query(
+      'sync_tombstones',
+      where: 'synced = 0',
+      orderBy: 'deleted_at ASC',
+    );
+    return maps.map((m) => SyncTombstone.fromMap(m)).toList();
+  }
+
+  Future<void> markTombstoneSynced(String tableName, String recordId) async {
+    final db = await database;
+    await db.update(
+      'sync_tombstones',
+      {'synced': 1},
+      where: 'table_name = ? AND record_id = ?',
+      whereArgs: [tableName, recordId],
+    );
+  }
+
+  // ==================== Notification Campaigns CRUD ====================
+  Future<List<NotificationCampaign>> getNotificationCampaigns() async {
+    final db = await database;
+    final maps = await db.query('notification_campaigns', orderBy: 'created_at DESC');
+    return maps.map((m) => NotificationCampaign.fromMap(m)).toList();
+  }
+
+  Future<NotificationCampaign?> getNotificationCampaignById(String id) async {
+    final db = await database;
+    final maps = await db.query('notification_campaigns', where: 'id = ?', whereArgs: [id]);
+    if (maps.isEmpty) return null;
+    return NotificationCampaign.fromMap(maps.first);
+  }
+
+  Future<void> insertNotificationCampaign(NotificationCampaign campaign) async {
+    final db = await database;
+    await db.insert('notification_campaigns', campaign.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<void> updateNotificationCampaign(NotificationCampaign campaign) async {
+    final db = await database;
+    await db.update('notification_campaigns', campaign.toMap(), where: 'id = ?', whereArgs: [campaign.id]);
+  }
+
+  Future<void> deleteNotificationCampaign(String id) async {
+    final db = await database;
+    await db.delete('notification_campaigns', where: 'id = ?', whereArgs: [id]);
+  }
+
+  // ==================== Admin Audit Logs ====================
+  Future<void> insertAuditLog({
+    required String action,
+    required String entityType,
+    required String entityId,
+    required String performedBy,
+    String? details,
+  }) async {
+    final db = await database;
+    await db.insert('admin_audit_logs', {
+      'id': 'audit_${DateTime.now().millisecondsSinceEpoch}_${entityId.hashCode}',
+      'action': action,
+      'entity_type': entityType,
+      'entity_id': entityId,
+      'performed_by': performedBy,
+      'timestamp': DateTime.now().toIso8601String(),
+      'details': details,
+    });
+  }
+
+  Future<List<Map<String, dynamic>>> getAuditLogs({int limit = 100}) async {
+    final db = await database;
+    return await db.query(
+      'admin_audit_logs',
+      orderBy: 'timestamp DESC',
+      limit: limit,
+    );
   }
 }

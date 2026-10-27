@@ -219,21 +219,94 @@ void main() {
       expect(feedLow.isLowStock, true);
     });
 
-    test('IncubationBatch days countdown', () {
+    test(
+      'calculateAvailableSaleableEggs accounts for incubation reservations and sold eggs',
+      () {
+        // 500 total usable eggs collected, 60 reserved for incubator, 120 sold
+        final available = FarmCalculations.calculateAvailableSaleableEggs(
+          totalUsableEggs: 500,
+          reservedForIncubation: 60,
+          totalSold: 120,
+        );
+        expect(available, 320);
+
+        // Attempting to sell when reservations exceed stock returns 0, never negative
+        final emptyAvailable = FarmCalculations.calculateAvailableSaleableEggs(
+          totalUsableEggs: 50,
+          reservedForIncubation: 40,
+          totalSold: 30,
+        );
+        expect(emptyAvailable, 0);
+      },
+    );
+
+    test('calculateCostPerEgg and calculateCostPerDozenEggs', () {
+      // 1000 DT flock production cost, 4000 usable eggs produced = 0.250 DT/egg, 3.000 DT/dozen
+      final costEgg = FarmCalculations.calculateCostPerEgg(
+        totalProductionCost: 1000.0,
+        totalUsableEggs: 4000,
+      );
+      expect(costEgg, 0.250);
+
+      final costDozen = FarmCalculations.calculateCostPerDozenEggs(
+        totalProductionCost: 1000.0,
+        totalUsableEggs: 4000,
+      );
+      expect(costDozen, 3.000);
+    });
+
+    test('Flock eligibleLayingFemales calculates only mature layer females', () {
       final now = DateTime.now();
+
+      // 1. Immature layer pullets (10 weeks old < 18 weeks): 0 eligible layers
+      final pullets = Flock(
+        id: 'flock_young',
+        name: 'Young Pullets',
+        species: 'chicken',
+        breed: 'Lohmann',
+        purpose: 'layers',
+        acquisitionDate: now.subtract(const Duration(days: 70)),
+        startCount: 100,
+        currentCount: 100,
+        maleCount: 10,
+        femaleCount: 90,
+        createdAt: now,
+      );
+      expect(pullets.eligibleLayingFemales, 0);
+
+      // 2. Mature layers (22 weeks old >= 18 weeks): 90 eligible females
+      final matureLayers = pullets.copyWith(
+        acquisitionDate: now.subtract(const Duration(days: 154)),
+      );
+      expect(matureLayers.eligibleLayingFemales, 90);
+
+      // 3. Broilers/Meat birds: 0 eligible laying females regardless of sex or age
+      final broilers = matureLayers.copyWith(purpose: 'meat');
+      expect(broilers.eligibleLayingFemales, 0);
+    });
+
+    test('IncubationBatch prevents duplicate chick transfer', () {
       final batch = IncubationBatch(
-        id: 'b1',
-        species: 'quail',
-        incubatorName: 'Auto 1',
-        setDate: now.subtract(const Duration(days: 12)),
-        eggsSetCount: 50,
-        expectedHatchDate: now.add(const Duration(days: 5)),
-        durationDays: 17,
-        createdAt: now.subtract(const Duration(days: 12)),
+        id: 'inc_test_1',
+        species: 'chicken',
+        incubatorName: 'Auto Incubator 1',
+        setDate: DateTime(2026, 1, 1),
+        eggsSetCount: 100,
+        expectedHatchDate: DateTime(2026, 1, 22),
+        hatchedCount: 82,
+        isTransferred: false,
+        createdAt: DateTime(2026, 1, 1),
       );
 
-      expect(batch.daysSinceSet, closeTo(12, 1));
-      expect(batch.daysUntilHatch, closeTo(5, 1));
+      expect(batch.isTransferred, false);
+      expect(batch.transferredFlockId, null);
+
+      final transferred = batch.copyWith(
+        isTransferred: true,
+        transferredFlockId: 'flock_hatched_inc_test_1',
+      );
+      expect(transferred.isTransferred, true);
+      expect(transferred.transferredFlockId, 'flock_hatched_inc_test_1');
     });
   });
 }

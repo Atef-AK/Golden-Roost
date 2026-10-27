@@ -18,6 +18,9 @@ import 'views/tasks/tasks_calendar_screen.dart';
 import 'views/reports/reports_screen.dart';
 import 'views/settings/settings_screen.dart';
 import 'views/splash/splash_screen.dart';
+import 'views/articles/articles_list_screen.dart';
+import 'views/products/products_catalogue_screen.dart';
+import 'views/admin/admin_dashboard_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
@@ -153,6 +156,21 @@ final appRouter = GoRouter(
       path: '/settings',
       parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) => const SettingsScreen(),
+    ),
+    GoRoute(
+      path: '/articles',
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) => const ArticlesListScreen(),
+    ),
+    GoRoute(
+      path: '/products',
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) => const ProductsCatalogueScreen(),
+    ),
+    GoRoute(
+      path: '/admin',
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) => const AdminDashboardScreen(),
     ),
   ],
 );

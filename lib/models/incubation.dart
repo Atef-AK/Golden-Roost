@@ -17,6 +17,8 @@ class IncubationBatch {
   final String status; // 'incubating', 'completed', 'cancelled'
   final double extraCosts; // electricity, sanitation, supplies
   final String notes;
+  final bool isTransferred; // True once chicks have been transferred to a flock
+  final String? transferredFlockId;
   final DateTime createdAt;
 
   const IncubationBatch({
@@ -38,6 +40,8 @@ class IncubationBatch {
     this.status = 'incubating',
     this.extraCosts = 0.0,
     this.notes = '',
+    this.isTransferred = false,
+    this.transferredFlockId,
     required this.createdAt,
   });
 
@@ -92,6 +96,8 @@ class IncubationBatch {
     String? status,
     double? extraCosts,
     String? notes,
+    bool? isTransferred,
+    String? transferredFlockId,
     DateTime? createdAt,
   }) {
     return IncubationBatch(
@@ -113,6 +119,8 @@ class IncubationBatch {
       status: status ?? this.status,
       extraCosts: extraCosts ?? this.extraCosts,
       notes: notes ?? this.notes,
+      isTransferred: isTransferred ?? this.isTransferred,
+      transferredFlockId: transferredFlockId ?? this.transferredFlockId,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -137,6 +145,8 @@ class IncubationBatch {
       'status': status,
       'extra_costs': extraCosts,
       'notes': notes,
+      'is_transferred': isTransferred ? 1 : 0,
+      'transferred_flock_id': transferredFlockId,
       'created_at': createdAt.toIso8601String(),
     };
   }
@@ -163,6 +173,8 @@ class IncubationBatch {
       status: map['status'] as String? ?? 'incubating',
       extraCosts: (map['extra_costs'] as num?)?.toDouble() ?? 0.0,
       notes: map['notes'] as String? ?? '',
+      isTransferred: (map['is_transferred'] as int? ?? 0) == 1,
+      transferredFlockId: map['transferred_flock_id'] as String?,
       createdAt: DateTime.parse(map['created_at'] as String),
     );
   }

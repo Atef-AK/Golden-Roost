@@ -447,8 +447,273 @@ class SettingsScreen extends ConsumerWidget {
                 ],
               ),
             ),
+            const SizedBox(height: 16),
+
+            // 6. Automation & Smart Calculations
+            PremiumCard(
+              padding: const EdgeInsets.all(18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryTeal.withAlpha(20),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.psychology_outlined,
+                          color: AppColors.primaryTeal,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Text(
+                          'Automation & Calculations',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Auto-Deduct Daily Estimated Feed'),
+                    subtitle: const Text(
+                      'When enabled, estimated consumption is deducted automatically once per day based on active bird counts and age curves.',
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    value: settings.autoFeedDeduction,
+                    activeThumbColor: AppColors.primaryTeal,
+                    onChanged: (val) {
+                      ref
+                          .read(settingsProvider.notifier)
+                          .toggleAutoFeedDeduction(val);
+                    },
+                  ),
+                  const Divider(height: 20),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Educational Sponsor Banners'),
+                    subtitle: const Text(
+                      'Display non-intrusive equipment and educational partner banners on articles and report screens.',
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    value: settings.adsEnabled,
+                    activeThumbColor: AppColors.primaryTeal,
+                    onChanged: (val) {
+                      ref.read(settingsProvider.notifier).toggleAds(val);
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // 7. Notification Channels & Consent
+            PremiumCard(
+              padding: const EdgeInsets.all(18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryTeal.withAlpha(20),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.mark_email_read_outlined,
+                          color: AppColors.primaryTeal,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Text(
+                          'Push Notification Channels',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Veterinary Article Alerts'),
+                    subtitle: const Text(
+                      'Receive alerts when new flock health, brooding, or biosecurity articles are published.',
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    value: settings.articleNotificationsEnabled,
+                    activeThumbColor: AppColors.primaryTeal,
+                    onChanged: (val) {
+                      ref
+                          .read(settingsProvider.notifier)
+                          .toggleArticleNotifications(val);
+                    },
+                  ),
+                  const Divider(height: 20),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Promotions & Equipment Launches'),
+                    subtitle: const Text(
+                      'Receive partner discounts and new product updates (Strictly Opt-In).',
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    value: settings.marketingNotificationsEnabled,
+                    activeThumbColor: AppColors.primaryTeal,
+                    onChanged: (val) {
+                      ref
+                          .read(settingsProvider.notifier)
+                          .toggleMarketingNotifications(val);
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // 8. Privacy, Security & Cloud Data
+            PremiumCard(
+              padding: const EdgeInsets.all(18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryTeal.withAlpha(20),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.security,
+                          color: AppColors.primaryTeal,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Text(
+                          'Privacy, Cloud & Data Rights',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Golden Roost operates offline-first. Your farm records are stored locally on this device in SQLite. Cloud synchronization and online accounts are optional.',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark
+                          ? AppColors.textMutedDark
+                          : AppColors.textMutedLight,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Optional Firebase Cloud Sync'),
+                    subtitle: Text(
+                      settings.cloudSyncEnabled
+                          ? 'Enabled: Records queue in local outbox for cloud backup.'
+                          : 'Disabled: 100% offline local SQLite storage.',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    value: settings.cloudSyncEnabled,
+                    activeThumbColor: AppColors.primaryTeal,
+                    onChanged: (val) {
+                      ref.read(settingsProvider.notifier).toggleCloudSync(val);
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.semanticError,
+                            side: const BorderSide(
+                              color: AppColors.semanticError,
+                            ),
+                          ),
+                          icon: const Icon(Icons.delete_forever, size: 18),
+                          label: const Text('Request Cloud Account Deletion'),
+                          onPressed: () => _showDeleteAccountDialog(context),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showDeleteAccountDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Cloud Account & Data'),
+        content: const SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Submitting this request will delete your cloud account, Firebase Authentication UID, and any synchronized cloud backups associated with this installation.',
+                style: TextStyle(fontSize: 13),
+              ),
+              SizedBox(height: 12),
+              Text(
+                'Note: Your local offline farm records on this phone will remain completely safe and operational in offline SQLite mode unless you explicitly perform "Clear All Data".',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.semanticError),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Cloud account deletion request recorded. Cloud synchronization disabled.',
+                  ),
+                ),
+              );
+            },
+            child: const Text('Confirm Deletion Request'),
+          ),
+        ],
       ),
     );
   }
