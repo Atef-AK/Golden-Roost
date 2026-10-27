@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
 
     // If client requests drafts, verify admin credentials
     if (includeDrafts) {
-      await verifyAdminSession(request, ['superadmin', 'editor', 'viewer']);
+      await verifyAdminSession(request, ['superadmin', 'editor', 'veterinarian', 'viewer']);
     }
 
     const conditions = [];
@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const admin = await verifyAdminSession(request, ['superadmin', 'editor']);
+    const admin = await verifyAdminSession(request, ['superadmin', 'editor', 'veterinarian']);
     const body = await request.json();
     const { slug, category, featuredImageUrl, isPublished, translations } = body;
 

@@ -24,7 +24,39 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing fcmToken' }, { status: 400 });
     }
 
-    const userTopics: string[] = Array.isArray(topics) ? topics : ['general_announcements', 'poultry_tips'];
+    const ALLOWED_TOPICS = [
+      'general_announcements',
+      'poultry_tips',
+      'disease_alerts',
+      'article_alerts',
+      'marketing_offers',
+    ] as const;
+
+    // Explicit consent booleans (strict default: marketing is opt-in only)
+    const marketingOptIn = Boolean(body.marketingOptIn === true);
+    const articleAlertsOptIn = body.articleAlertsOptIn !== undefined ? Boolean(body.articleAlertsOptIn) : true;
+    const diseaseAlertsOptIn = body.diseaseAlertsOptIn !== undefined ? Boolean(body.diseaseAlertsOptIn) : true;
+
+    // Whitelist and filter user topics based on explicit consent
+    let requestedTopics: string[] = Array.isArray(topics) ? topics : ['general_announcements', 'poultry_tips'];
+    const sanitizedTopics = requestedTopics.filter((t): t is string =>
+      typeof t === 'string' && (ALLOWED_TOPICS as readonly string[]).includes(t)
+    );
+
+    // Apply strict consent filters
+    const userTopics = sanitizedTopics.filter((t) => {
+      if (t === 'marketing_offers' && !marketingOptIn) return false;
+      if (t === 'article_alerts' && !articleAlertsOptIn) return false;
+      if (t === 'disease_alerts' && !diseaseAlertsOptIn) return false;
+      return true;
+    });
+
+    if (userTopics.length === 0) {
+      userTopics.push('general_announcements');
+    }
+
+    const validPlatform = ['android', 'ios', 'web'].includes(platform) ? platform : 'android';
+    const validLocale = ['en', 'fr', 'ar'].includes(locale) ? locale : 'en';
 
     // Upsert into Neon PostgreSQL
     const [device] = await db
@@ -32,9 +64,12 @@ export async function POST(request: NextRequest) {
       .values({
         fcmToken,
         deviceId: deviceId || null,
-        platform: platform || 'android',
-        locale: locale || 'en',
+        platform: validPlatform,
+        locale: validLocale,
         topics: userTopics,
+        marketingOptIn,
+        articleAlertsOptIn,
+        diseaseAlertsOptIn,
         isActive: true,
         lastSeenAt: new Date(),
       })
@@ -42,9 +77,12 @@ export async function POST(request: NextRequest) {
         target: pushDevices.fcmToken,
         set: {
           deviceId: deviceId || null,
-          platform: platform || 'android',
-          locale: locale || 'en',
+          platform: validPlatform,
+          locale: validLocale,
           topics: userTopics,
+          marketingOptIn,
+          articleAlertsOptIn,
+          diseaseAlertsOptIn,
           isActive: true,
           lastSeenAt: new Date(),
         },
@@ -64,6 +102,11 @@ export async function POST(request: NextRequest) {
       success: true,
       deviceId: device.id,
       topics: userTopics,
+      consent: {
+        marketingOptIn,
+        articleAlertsOptIn,
+        diseaseAlertsOptIn,
+      },
     });
   } catch (err) {
     console.error('Device registration failed:', err);

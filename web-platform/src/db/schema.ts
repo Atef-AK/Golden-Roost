@@ -17,7 +17,7 @@ export const adminUsers = pgTable('admin_users', {
     .$defaultFn(() => crypto.randomUUID()),
   email: text('email').notNull().unique(),
   firebaseUid: text('firebase_uid').notNull().unique(),
-  role: text('role').notNull().default('viewer'), // 'superadmin' | 'editor' | 'viewer'
+  role: text('role').notNull().default('viewer'), // 'superadmin' | 'editor' | 'veterinarian' | 'viewer'
   displayName: text('display_name'),
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
@@ -118,6 +118,9 @@ export const pushDevices = pgTable('push_devices', {
   platform: text('platform').notNull().default('android'), // 'android' | 'ios' | 'web'
   locale: text('locale').notNull().default('en'),
   topics: jsonb('topics').notNull().default('[]'),
+  marketingOptIn: boolean('marketing_opt_in').notNull().default(false),
+  articleAlertsOptIn: boolean('article_alerts_opt_in').notNull().default(true),
+  diseaseAlertsOptIn: boolean('disease_alerts_opt_in').notNull().default(true),
   isActive: boolean('is_active').notNull().default(true),
   lastSeenAt: timestamp('last_seen_at', { withTimezone: true }).notNull().defaultNow(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
@@ -129,10 +132,14 @@ export const notificationCampaigns = pgTable('notification_campaigns', {
     .$defaultFn(() => crypto.randomUUID()),
   title: text('title').notNull(),
   body: text('body').notNull(),
+  campaignType: text('campaign_type').notNull().default('announcement'), // 'announcement' | 'article_alert' | 'disease_alert' | 'marketing'
+  targetLocale: text('target_locale').default('all'), // 'all' | 'en' | 'fr' | 'ar'
   targetTopic: text('target_topic'),
   dataPayload: jsonb('data_payload'),
   status: text('status').notNull().default('draft'), // 'draft' | 'scheduled' | 'processing' | 'completed' | 'failed'
   scheduledAt: timestamp('scheduled_at', { withTimezone: true }),
+  lockedAt: timestamp('locked_at', { withTimezone: true }),
+  completedAt: timestamp('completed_at', { withTimezone: true }),
   sentCount: integer('sent_count').notNull().default(0),
   failedCount: integer('failed_count').notNull().default(0),
   createdBy: text('created_by').references(() => adminUsers.id),

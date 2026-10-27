@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { notificationCampaigns, pushDevices, notificationDeliveries } from '@/db/schema';
-import { eq, desc, and } from 'drizzle-orm';
+import { notificationCampaigns, pushDevices } from '@/db/schema';
+import { eq, desc } from 'drizzle-orm';
 import { verifyAdminSession, AuthError } from '@/lib/auth';
-import { firebaseAdmin } from '@/lib/firebase-admin';
 import { logAdminAction } from '@/lib/audit';
+import { processSingleCampaignDurable } from '@/lib/campaign-processor';
 
 export async function GET(request: NextRequest) {
   try {
-    await verifyAdminSession(request, ['superadmin', 'editor', 'viewer']);
+    await verifyAdminSession(request, ['superadmin', 'editor', 'veterinarian', 'viewer']);
 
     const campaigns = await db
       .select()
@@ -36,9 +36,18 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const admin = await verifyAdminSession(request, ['superadmin', 'editor']);
+    const admin = await verifyAdminSession(request, ['superadmin', 'editor', 'veterinarian']);
     const body = await request.json();
-    const { title, body: msgBody, targetTopic, dataPayload, scheduledAt, sendImmediately } = body;
+    const {
+      title,
+      body: msgBody,
+      campaignType = 'announcement',
+      targetLocale = 'all',
+      targetTopic,
+      dataPayload,
+      scheduledAt,
+      sendImmediately,
+    } = body;
 
     if (!title || !msgBody) {
       return NextResponse.json(
@@ -55,10 +64,13 @@ export async function POST(request: NextRequest) {
       .values({
         title,
         body: msgBody,
+        campaignType,
+        targetLocale,
         targetTopic: targetTopic || 'general_announcements',
         dataPayload: dataPayload || {},
         status: initialStatus,
         scheduledAt: scheduledDate,
+        lockedAt: sendImmediately ? new Date() : null,
         createdBy: admin.id,
       })
       .returning();
@@ -68,123 +80,21 @@ export async function POST(request: NextRequest) {
       action: 'CAMPAIGN_CREATE',
       entityType: 'notification_campaign',
       entityId: campaign.id,
-      metadata: { title, targetTopic, sendImmediately },
+      metadata: { title, campaignType, targetLocale, targetTopic, sendImmediately },
     });
 
-    // If sendImmediately, trigger immediate dispatch
+    // If sendImmediately, trigger durable execution
     if (sendImmediately) {
-      // Background dispatch in serverless handler
-      (async () => {
-        try {
-          // If sending to topic
-          if (targetTopic) {
-            const fcmResponse = await firebaseAdmin.messaging().send({
-              topic: targetTopic,
-              notification: {
-                title,
-                body: msgBody,
-              },
-              data: {
-                campaignId: campaign.id,
-                clickAction: 'FLUTTER_NOTIFICATION_CLICK',
-                ...Object.fromEntries(
-                  Object.entries(dataPayload || {}).map(([k, v]) => [k, String(v)])
-                ),
-              },
-            });
-
-            await db
-              .update(notificationCampaigns)
-              .set({
-                status: 'completed',
-                sentCount: 1, // Represents topic broadcast
-              })
-              .where(eq(notificationCampaigns.id, campaign.id));
-          } else {
-            // Direct device batch send
-            const devices = await db
-              .select()
-              .from(pushDevices)
-              .where(eq(pushDevices.isActive, true))
-              .limit(500);
-
-            if (devices.length > 0) {
-              const tokens = devices.map((d) => d.fcmToken);
-              const multicastRes = await firebaseAdmin.messaging().sendEachForMulticast({
-                tokens,
-                notification: { title, body: msgBody },
-                data: {
-                  campaignId: campaign.id,
-                  clickAction: 'FLUTTER_NOTIFICATION_CLICK',
-                },
-              });
-
-              let sent = 0;
-              let failed = 0;
-
-              for (let i = 0; i < multicastRes.responses.length; i++) {
-                const res = multicastRes.responses[i];
-                const device = devices[i];
-
-                if (res.success) {
-                  sent++;
-                  await db
-                    .insert(notificationDeliveries)
-                    .values({
-                      campaignId: campaign.id,
-                      deviceId: device.id,
-                      fcmMessageId: res.messageId,
-                      status: 'sent',
-                    })
-                    .onConflictDoNothing();
-                } else {
-                  failed++;
-                  const errorCode = res.error?.code || 'UNKNOWN';
-                  await db
-                    .insert(notificationDeliveries)
-                    .values({
-                      campaignId: campaign.id,
-                      deviceId: device.id,
-                      status: 'failed',
-                      errorCode,
-                    })
-                    .onConflictDoNothing();
-
-                  if (
-                    errorCode === 'messaging/registration-token-not-registered' ||
-                    errorCode === 'messaging/invalid-registration-token'
-                  ) {
-                    await db
-                      .update(pushDevices)
-                      .set({ isActive: false })
-                      .where(eq(pushDevices.id, device.id));
-                  }
-                }
-              }
-
-              await db
-                .update(notificationCampaigns)
-                .set({
-                  status: 'completed',
-                  sentCount: sent,
-                  failedCount: failed,
-                })
-                .where(eq(notificationCampaigns.id, campaign.id));
-            } else {
-              await db
-                .update(notificationCampaigns)
-                .set({ status: 'completed' })
-                .where(eq(notificationCampaigns.id, campaign.id));
-            }
-          }
-        } catch (dispatchErr) {
-          console.error('Immediate campaign dispatch failed:', dispatchErr);
-          await db
-            .update(notificationCampaigns)
-            .set({ status: 'failed' })
-            .where(eq(notificationCampaigns.id, campaign.id));
-        }
-      })();
+      // Run durable processing
+      const processResult = await processSingleCampaignDurable(campaign.id);
+      return NextResponse.json(
+        {
+          success: true,
+          campaign,
+          deliveryResult: processResult,
+        },
+        { status: 201 }
+      );
     }
 
     return NextResponse.json({ success: true, campaign }, { status: 201 });

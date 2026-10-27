@@ -29,12 +29,19 @@ android {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
+    val admobAppId = if (keystorePropertiesFile.exists()) {
+        (keystoreProperties["admobAppId"] as? String) ?: "ca-app-pub-3940256099942544~3347511713"
+    } else {
+        "ca-app-pub-3940256099942544~3347511713"
+    }
+
     defaultConfig {
         applicationId = "com.goldenroost.app"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders["admobAppId"] = admobAppId
     }
 
     signingConfigs {
@@ -50,10 +57,22 @@ android {
 
     buildTypes {
         release {
-            signingConfig = if (keystorePropertiesFile.exists()) {
-                signingConfigs.getByName("release")
+            if (keystorePropertiesFile.exists()) {
+                signingConfig = signingConfigs.getByName("release")
             } else {
-                signingConfigs.getByName("debug")
+                gradle.taskGraph.whenReady {
+                    val isReleaseBuild = allTasks.any { task ->
+                        task.name.contains("Release", ignoreCase = true) &&
+                        (task.name.startsWith("assemble") || task.name.startsWith("bundle"))
+                    }
+                    if (isReleaseBuild && !keystorePropertiesFile.exists()) {
+                        throw GradleException(
+                            "CRITICAL RELEASE SIGNING ERROR: android/key.properties is missing!\n" +
+                            "Production release builds cannot fall back to debug signing.\n" +
+                            "Please provide key.properties with storeFile, storePassword, keyAlias, and keyPassword."
+                        )
+                    }
+                }
             }
         }
     }

@@ -63,13 +63,36 @@ signingConfigs {
 
 buildTypes {
     release {
-        signingConfig = signingConfigs.getByName(if (keystorePropertiesFile.exists()) "release" else "debug")
-        isMinifyEnabled = true
-        isShrinkResources = true
-        proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        if (keystorePropertiesFile.exists()) {
+            signingConfig = signingConfigs.getByName("release")
+        } else {
+            gradle.taskGraph.whenReady {
+                val isReleaseBuild = allTasks.any { task ->
+                    task.name.contains("Release", ignoreCase = true) &&
+                    (task.name.startsWith("assemble") || task.name.startsWith("bundle"))
+                }
+                if (isReleaseBuild && !keystorePropertiesFile.exists()) {
+                    throw GradleException(
+                        "CRITICAL RELEASE SIGNING ERROR: android/key.properties is missing!\n" +
+                        "Production release builds cannot fall back to debug signing.\n" +
+                        "Please provide key.properties with storeFile, storePassword, keyAlias, and keyPassword."
+                    )
+                }
+            }
+        }
     }
 }
 ```
+
+### 2.4 Google Mobile Ads SDK Configuration
+Google Play and the Mobile Ads SDK require `com.google.android.gms.ads.APPLICATION_ID` in `AndroidManifest.xml`.
+In `android/app/build.gradle.kts`:
+- Development builds fall back to Google's official test App ID: `ca-app-pub-3940256099942544~3347511713`.
+- Production builds read `admobAppId` from `android/key.properties`:
+```properties
+admobAppId=ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX
+```
+`AndroidManifest.xml` injects this dynamically via `${admobAppId}`.
 
 ---
 

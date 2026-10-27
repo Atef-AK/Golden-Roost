@@ -4,11 +4,13 @@ import { db } from '../db';
 import { adminUsers } from '../db/schema';
 import { eq } from 'drizzle-orm';
 
+export type AdminRole = 'superadmin' | 'editor' | 'veterinarian' | 'viewer';
+
 export interface AuthenticatedAdmin {
   id: string;
   email: string;
   firebaseUid: string;
-  role: 'superadmin' | 'editor' | 'viewer';
+  role: AdminRole;
   displayName: string | null;
 }
 
@@ -62,7 +64,7 @@ export function validateCsrf(request: NextRequest): void {
  */
 export async function verifyAdminSession(
   request: NextRequest,
-  allowedRoles?: ('superadmin' | 'editor' | 'viewer')[]
+  allowedRoles?: AdminRole[]
 ): Promise<AuthenticatedAdmin> {
   validateCsrf(request);
 
@@ -139,7 +141,7 @@ export async function verifyAdminSession(
     throw new AuthError('Admin account has been deactivated. Please contact Superadmin.', 403);
   }
 
-  const role = user.role as 'superadmin' | 'editor' | 'viewer';
+  const role = user.role as AdminRole;
 
   if (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes(role)) {
     throw new AuthError(

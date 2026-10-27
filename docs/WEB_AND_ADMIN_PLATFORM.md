@@ -55,15 +55,22 @@ This document describes the architecture, database schema, administrative portal
 
 ---
 
-## 3. Security Model
+## 3. Security & Push Notification Model
 
 1. **Zero Hardcoded PINs or Secrets**: All legacy mobile PIN backdoors have been completely removed. Privileged actions require authenticated administrative sessions.
 2. **Server-Side HTTP-Only Cookies**: Admin login exchanges Firebase ID tokens for 5-day secure `HttpOnly` session cookies (`gr_admin_session`) with `SameSite=Lax`.
 3. **Authoritative Neon Live RBAC**: On every single administrative request, the server executes a live check against `admin_users` in Neon PostgreSQL:
    - Validates `is_active = true` (instant deactivation).
-   - Dynamically reads the current role (`superadmin`, `editor`, `viewer`).
-4. **Serverless Rate Limiting**: All sensitive endpoints (`/api/v1/admin/auth/session`, `/api/v1/account-deletion/*`, `/api/v1/mobile/devices/register`) use atomic PostgreSQL rate-limit counters (`rate_limit_buckets`) to prevent brute force without relying on in-memory state.
-5. **CSRF Validation**: Mutation endpoints validate request `Origin` and `Referer` headers against the hosting domain.
+   - Dynamically reads the current role across the complete enterprise role hierarchy: `'superadmin' | 'editor' | 'veterinarian' | 'viewer'`.
+   - Veterinarians have direct authoring authority over disease alerts, protocols, and knowledge articles.
+4. **Mandatory CRON_SECRET Protection & Database Lease**:
+   - `/api/cron/process-campaigns` unconditionally rejects invocations if `CRON_SECRET` is unset or mismatched (`401 Unauthorized`).
+   - Campaign processing uses atomic claiming (`UPDATE ... WHERE status = 'scheduled' RETURNING id`) with a 5-minute lease lock (`locked_at`) to prevent duplicate delivery across simultaneous invocations.
+5. **Targeting & Explicit Consent Enforcement**:
+   - Mobile registration (`/api/v1/mobile/devices/register`) enforces a strict topic whitelist and captures explicit opt-in booleans: `marketing_opt_in`, `article_alerts_opt_in`, `disease_alerts_opt_in`.
+   - Campaign delivery durably queries unnotified recipients in 500-token multicast batches, guarantees marketing campaigns strictly exclude non-opted-in users, filters by language (`target_locale`), and records per-device delivery audit logs in `notification_deliveries`.
+6. **Serverless Rate Limiting**: All sensitive endpoints (`/api/v1/admin/auth/session`, `/api/v1/account-deletion/*`, `/api/v1/mobile/devices/register`) use atomic PostgreSQL rate-limit counters (`rate_limit_buckets`) to prevent brute force without relying on in-memory state.
+7. **CSRF Validation**: Mutation endpoints validate request `Origin` and `Referer` headers against the hosting domain.
 
 ---
 

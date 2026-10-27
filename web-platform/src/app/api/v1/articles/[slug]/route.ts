@@ -60,7 +60,7 @@ export async function PUT(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const admin = await verifyAdminSession(request, ['superadmin', 'editor']);
+    const admin = await verifyAdminSession(request, ['superadmin', 'editor', 'veterinarian']);
     const { slug } = await params;
     const body = await request.json();
     const { category, featuredImageUrl, isPublished, translations } = body;

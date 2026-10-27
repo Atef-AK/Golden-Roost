@@ -8,6 +8,13 @@
       "when": 1793135621225,
       "tag": "0000_narrow_scarlet_witch",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793137936992,
+      "tag": "0001_noisy_diamondback",
+      "breakpoints": true
     }
   ]
 }

@@ -7,6 +7,8 @@ interface CampaignItem {
   id: string;
   title: string;
   body: string;
+  campaignType?: string;
+  targetLocale?: string;
   targetTopic: string | null;
   status: string;
   sentCount: number;
@@ -23,6 +25,8 @@ export default function AdminNotificationsPage() {
   // Composer Form
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
+  const [campaignType, setCampaignType] = useState('announcement');
+  const [targetLocale, setTargetLocale] = useState('all');
   const [targetTopic, setTargetTopic] = useState('general_announcements');
   const [sendImmediately, setSendImmediately] = useState(true);
   const [scheduledAt, setScheduledAt] = useState('');
@@ -58,6 +62,8 @@ export default function AdminNotificationsPage() {
     const payload = {
       title: title.trim(),
       body: body.trim(),
+      campaignType,
+      targetLocale,
       targetTopic: targetTopic === 'all_direct' ? null : targetTopic,
       sendImmediately,
       scheduledAt: !sendImmediately && scheduledAt ? new Date(scheduledAt).toISOString() : null,
@@ -166,6 +172,36 @@ export default function AdminNotificationsPage() {
               />
             </div>
 
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1">Campaign Type</label>
+                <select
+                  value={campaignType}
+                  onChange={(e) => setCampaignType(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl text-xs bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-amber-500"
+                >
+                  <option value="announcement">Announcement</option>
+                  <option value="disease_alert">Disease Alert (Urgent)</option>
+                  <option value="article_alert">Article Alert</option>
+                  <option value="marketing">Marketing (Opt-in only)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1">Target Language</label>
+                <select
+                  value={targetLocale}
+                  onChange={(e) => setTargetLocale(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl text-xs bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-amber-500"
+                >
+                  <option value="all">All Languages</option>
+                  <option value="en">English (en)</option>
+                  <option value="fr">Français (fr)</option>
+                  <option value="ar">العربية (ar)</option>
+                </select>
+              </div>
+            </div>
+
             <div>
               <label className="block text-xs font-bold text-slate-300 mb-1">Target Audience</label>
               <select
@@ -176,7 +212,8 @@ export default function AdminNotificationsPage() {
                 <option value="general_announcements">All Users (general_announcements)</option>
                 <option value="poultry_tips">Poultry Tips & Veterinary Protocols</option>
                 <option value="disease_alerts">Urgent Disease Alerts Only</option>
-                <option value="all_direct">Direct Token Multicast (500 device batch)</option>
+                <option value="marketing_offers">Marketing Offers (Opted-in)</option>
+                <option value="all_direct">Direct Token Multicast (All Eligible Devices)</option>
               </select>
             </div>
 
@@ -269,8 +306,17 @@ export default function AdminNotificationsPage() {
                             {camp.body}
                           </span>
                         </td>
-                        <td className="px-6 py-4 font-mono text-[11px] text-amber-400">
-                          {camp.targetTopic || 'Direct Multicast'}
+                        <td className="px-6 py-4 text-[11px]">
+                          <div className="font-mono text-amber-400 font-semibold">
+                            {camp.targetTopic || 'Direct Multicast'}
+                          </div>
+                          <div className="flex items-center gap-1.5 mt-1 text-[10px] text-slate-400">
+                            <span className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-medium">
+                              {camp.campaignType || 'announcement'}
+                            </span>
+                            <span className="text-slate-500">•</span>
+                            <span>{camp.targetLocale ? `Lang: ${camp.targetLocale}` : 'All Langs'}</span>
+                          </div>
                         </td>
                         <td className="px-6 py-4">
                           <span

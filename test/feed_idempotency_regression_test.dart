@@ -246,5 +246,25 @@ void main() {
       pendingTombstones = await DatabaseHelper.instance.getPendingTombstones();
       expect(pendingTombstones.isEmpty, isTrue, reason: 'Tombstone marked synced only after remote confirmation');
     });
+
+    test('SyncService reports error and preserves tombstones when cloudTombstoneAdapter is null', () async {
+      await SyncService.instance.enqueueOperation(
+        tableName: 'flocks',
+        recordId: 'flock_tombstone_null_adapter',
+        action: 'delete',
+        data: {'id': 'flock_tombstone_null_adapter'},
+      );
+
+      final result = await SyncService.instance.synchronize(
+        isCloudConnected: true,
+        cloudAdapter: (item) async => true,
+        cloudTombstoneAdapter: null, // Missing tombstone adapter
+      );
+
+      expect(result.status, equals(SyncStatus.error));
+      expect(result.errorMessage, contains('No remote tombstone adapter is configured'));
+      final pendingTombstones = await DatabaseHelper.instance.getPendingTombstones();
+      expect(pendingTombstones.any((t) => t.recordId == 'flock_tombstone_null_adapter'), isTrue);
+    });
   });
 }

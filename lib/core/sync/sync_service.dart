@@ -166,24 +166,46 @@ class SyncService {
     }
 
     // Process tombstones only if a tombstone adapter is provided and confirms deletion
-    if (cloudTombstoneAdapter != null) {
-      for (final tombstone in pendingTombstones) {
-        try {
-          final tombstoneSynced = await cloudTombstoneAdapter(tombstone);
-          if (tombstoneSynced) {
-            await DatabaseHelper.instance.markTombstoneSynced(
-              tombstone.tableName,
-              tombstone.recordId,
-            );
+    if (pendingTombstones.isNotEmpty) {
+      if (cloudTombstoneAdapter == null) {
+        failedCount += pendingTombstones.length;
+        firstError ??=
+            'Cannot synchronize tombstones: No remote tombstone adapter is configured. Deletion records preserved locally.';
+      } else {
+        for (final tombstone in pendingTombstones) {
+          try {
+            final tombstoneSynced = await cloudTombstoneAdapter(tombstone);
+            if (tombstoneSynced) {
+              await DatabaseHelper.instance.markTombstoneSynced(
+                tombstone.tableName,
+                tombstone.recordId,
+              );
+              syncedCount++;
+            } else {
+              failedCount++;
+              firstError ??= 'Tombstone deletion rejected by remote adapter';
+            }
+          } catch (e) {
+            failedCount++;
+            firstError ??= e.toString();
           }
-        } catch (_) {
-          // Keep tombstone pending on network error
         }
       }
     }
 
     _lastSyncTime = DateTime.now();
-    _setStatus(failedCount == 0 ? SyncStatus.success : SyncStatus.error);
+
+    // Verify whether any items or tombstones remain pending in SQLite
+    final remainingItems =
+        await DatabaseHelper.instance.getPendingSyncItems();
+    final remainingTombstones =
+        await DatabaseHelper.instance.getPendingTombstones();
+
+    final isFullySynced = remainingItems.isEmpty &&
+        remainingTombstones.isEmpty &&
+        failedCount == 0;
+
+    _setStatus(isFullySynced ? SyncStatus.success : SyncStatus.error);
 
     return SyncResult(
       syncedCount: syncedCount,
