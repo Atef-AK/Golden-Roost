@@ -103,11 +103,6 @@ export default function Footer() {
                   <span>{t.deleteAccount}</span>
                 </Link>
               </li>
-              <li>
-                <Link href="/admin/login" className="hover:text-amber-400 transition-colors">
-                  {t.navAdmin}
-                </Link>
-              </li>
             </ul>
           </div>
 

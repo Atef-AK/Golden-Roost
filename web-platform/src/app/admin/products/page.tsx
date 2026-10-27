@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ShoppingBag,
   Plus,
@@ -14,8 +14,12 @@ import {
   Save,
   Search,
   Star,
+  Eye,
 } from 'lucide-react';
 import { Locale } from '@/lib/i18n';
+import RichContentToolbar from '@/components/RichContentToolbar';
+import ImageUploadField from '@/components/ImageUploadField';
+import MarkdownRenderer from '@/components/MarkdownRenderer';
 
 interface ProductItem {
   id: string;
@@ -67,6 +71,9 @@ export default function AdminProductsPage() {
     ar: { name: '', description: '' },
   });
 
+  const [contentViewMode, setContentViewMode] = useState<'write' | 'preview'>('write');
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
   const loadProducts = async () => {
     try {
       setLoading(true);
@@ -115,6 +122,7 @@ export default function AdminProductsPage() {
       ar: { name: '', description: '' },
     });
     setActiveTab('en');
+    setContentViewMode('write');
     setErrorMsg(null);
     setIsModalOpen(true);
   };
@@ -153,6 +161,7 @@ export default function AdminProductsPage() {
 
         setTranslationsData(newTrans);
         setActiveTab('en');
+        setContentViewMode('write');
         setErrorMsg(null);
         setIsModalOpen(true);
       }
@@ -461,15 +470,12 @@ export default function AdminProductsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">
-                  Product Image URL
-                </label>
-                <input
-                  type="url"
+                <ImageUploadField
+                  label="Product Main Image"
                   value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="https://..."
-                  className="w-full px-3 py-2 rounded-xl text-xs bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-emerald-500"
+                  onChange={setImageUrl}
+                  placeholder="https://images.unsplash.com/... or upload photo"
+                  accent="emerald"
                 />
               </div>
 
@@ -524,24 +530,78 @@ export default function AdminProductsPage() {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">
-                      Description ({activeTab.toUpperCase()})
-                    </label>
-                    <textarea
-                      rows={4}
-                      value={translationsData[activeTab].description}
-                      onChange={(e) =>
-                        setTranslationsData({
-                          ...translationsData,
-                          [activeTab]: {
-                            ...translationsData[activeTab],
-                            description: e.target.value,
-                          },
-                        })
-                      }
-                      className="w-full px-3 py-2 rounded-xl text-xs bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-emerald-500"
-                    />
+                  {/* Rich Product Description & Specs */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-xs font-bold text-slate-300">
+                        Description & Specifications ({activeTab.toUpperCase()})
+                      </label>
+                      <div className="flex items-center gap-1 p-0.5 rounded-lg bg-slate-800 text-[11px] font-bold">
+                        <button
+                          type="button"
+                          onClick={() => setContentViewMode('write')}
+                          className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-all ${
+                            contentViewMode === 'write'
+                              ? 'bg-emerald-600 text-white shadow-sm'
+                              : 'text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          <Edit2 size={12} />
+                          <span>Write & Format</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setContentViewMode('preview')}
+                          className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-all ${
+                            contentViewMode === 'preview'
+                              ? 'bg-emerald-600 text-white shadow-sm'
+                              : 'text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          <Eye size={12} />
+                          <span>Live Preview</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {contentViewMode === 'write' ? (
+                      <div>
+                        <RichContentToolbar
+                          textareaRef={textareaRef}
+                          value={translationsData[activeTab].description}
+                          onChange={(val) =>
+                            setTranslationsData({
+                              ...translationsData,
+                              [activeTab]: {
+                                ...translationsData[activeTab],
+                                description: val,
+                              },
+                            })
+                          }
+                          accent="emerald"
+                        />
+                        <textarea
+                          ref={textareaRef}
+                          rows={8}
+                          value={translationsData[activeTab].description}
+                          onChange={(e) =>
+                            setTranslationsData({
+                              ...translationsData,
+                              [activeTab]: {
+                                ...translationsData[activeTab],
+                                description: e.target.value,
+                              },
+                            })
+                          }
+                          placeholder="Author product features, technical specifications table, usage guidelines, and embedded images..."
+                          className="w-full px-3 py-2.5 rounded-b-xl text-xs font-mono bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-emerald-500 leading-relaxed"
+                        />
+                      </div>
+                    ) : (
+                      <div className="p-4 rounded-xl bg-slate-900 border border-slate-700 min-h-[180px] max-h-[320px] overflow-y-auto">
+                        <MarkdownRenderer content={translationsData[activeTab].description} />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

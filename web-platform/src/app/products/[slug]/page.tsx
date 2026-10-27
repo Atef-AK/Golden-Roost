@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { ArrowLeft, Star, ExternalLink, ShieldCheck, AlertCircle } from 'lucide-react';
 import { Locale } from '@/lib/i18n';
 import AdSenseBanner from '@/components/AdSenseBanner';
+import MarkdownRenderer from '@/components/MarkdownRenderer';
 
 interface ProductDetail {
   id: string;
@@ -163,9 +164,9 @@ function ProductDetailContent() {
             </span>
           </div>
 
-          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-            {product.description}
-          </p>
+          <div className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+            <MarkdownRenderer content={product.description} />
+          </div>
 
           <a
             href={product.affiliateUrl}

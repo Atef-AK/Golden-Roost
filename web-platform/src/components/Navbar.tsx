@@ -18,6 +18,11 @@ export default function Navbar() {
     const savedTheme = (localStorage.getItem('gr_theme') as 'light' | 'dark') || 'light';
     setLocale(savedLocale);
     setTheme(savedTheme);
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
     document.documentElement.setAttribute('data-theme', savedTheme);
     document.documentElement.setAttribute('dir', savedLocale === 'ar' ? 'rtl' : 'ltr');
     document.documentElement.setAttribute('lang', savedLocale);
@@ -36,6 +41,11 @@ export default function Navbar() {
     const nextTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(nextTheme);
     localStorage.setItem('gr_theme', nextTheme);
+    if (nextTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
     document.documentElement.setAttribute('data-theme', nextTheme);
   };
 
@@ -162,15 +172,6 @@ export default function Navbar() {
             >
               {theme === 'light' ? <Moon size={18} /> : <Sun size={18} className="text-amber-400" />}
             </button>
-
-            {/* Admin Portal Button */}
-            <Link
-              href="/admin/login"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 dark:bg-slate-800 text-white hover:bg-amber-600 dark:hover:bg-amber-600 transition-colors shadow-sm"
-            >
-              <Shield size={14} className="text-amber-400" />
-              <span>{t.navAdmin}</span>
-            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -235,14 +236,6 @@ export default function Navbar() {
             >
               <Phone size={18} />
               <span>{t.navContact}</span>
-            </Link>
-            <Link
-              href="/admin/login"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-3 p-2 rounded-lg font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30"
-            >
-              <Shield size={18} />
-              <span>{t.navAdmin}</span>
             </Link>
           </nav>
 

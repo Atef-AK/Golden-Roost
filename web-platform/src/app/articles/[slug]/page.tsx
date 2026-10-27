@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Locale } from '@/lib/i18n';
 import AdSenseBanner from '@/components/AdSenseBanner';
+import MarkdownRenderer from '@/components/MarkdownRenderer';
 
 interface ArticleDetail {
   id: string;
@@ -166,9 +167,9 @@ function ArticleDetailContent() {
         </div>
       )}
 
-      {/* Main Content Body */}
-      <div className="prose dark:prose-invert max-w-none text-slate-800 dark:text-slate-200 leading-relaxed text-sm sm:text-base space-y-4 whitespace-pre-line">
-        {article.content}
+      {/* Main Content Body with Rich Markdown & Images */}
+      <div className="pt-2">
+        <MarkdownRenderer content={article.content} />
       </div>
 
       {/* AdSense Placement */}

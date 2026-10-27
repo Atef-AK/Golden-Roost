@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   FileText,
   Plus,
@@ -15,6 +15,9 @@ import {
   Search,
 } from 'lucide-react';
 import { Locale } from '@/lib/i18n';
+import RichContentToolbar from '@/components/RichContentToolbar';
+import ImageUploadField from '@/components/ImageUploadField';
+import MarkdownRenderer from '@/components/MarkdownRenderer';
 
 interface ArticleItem {
   id: string;
@@ -60,6 +63,9 @@ export default function AdminArticlesPage() {
     ar: { title: '', summary: '', content: '' },
   });
 
+  const [contentViewMode, setContentViewMode] = useState<'write' | 'preview'>('write');
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
   const loadArticles = async () => {
     try {
       setLoading(true);
@@ -104,6 +110,7 @@ export default function AdminArticlesPage() {
       ar: { title: '', summary: '', content: '' },
     });
     setActiveTab('en');
+    setContentViewMode('write');
     setErrorMsg(null);
     setIsModalOpen(true);
   };
@@ -139,6 +146,7 @@ export default function AdminArticlesPage() {
 
         setTranslationsData(newTrans);
         setActiveTab('en');
+        setContentViewMode('write');
         setErrorMsg(null);
         setIsModalOpen(true);
       }
@@ -379,21 +387,18 @@ export default function AdminArticlesPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-start">
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
-                    Featured Image URL (Optional)
-                  </label>
-                  <input
-                    type="url"
+                  <ImageUploadField
+                    label="Featured Article Image"
                     value={featuredImageUrl}
-                    onChange={(e) => setFeaturedImageUrl(e.target.value)}
-                    placeholder="https://images.unsplash.com/..."
-                    className="w-full px-3 py-2 rounded-xl text-xs bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-amber-500"
+                    onChange={setFeaturedImageUrl}
+                    placeholder="https://images.unsplash.com/... or upload photo"
+                    accent="amber"
                   />
                 </div>
 
-                <div className="pt-5">
+                <div className="pt-7">
                   <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-300">
                     <input
                       type="checkbox"
@@ -479,25 +484,78 @@ export default function AdminArticlesPage() {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">
-                      Full Article Body ({activeTab.toUpperCase()} Markdown)
-                    </label>
-                    <textarea
-                      rows={8}
-                      value={translationsData[activeTab].content}
-                      onChange={(e) =>
-                        setTranslationsData({
-                          ...translationsData,
-                          [activeTab]: {
-                            ...translationsData[activeTab],
-                            content: e.target.value,
-                          },
-                        })
-                      }
-                      placeholder="Use markdown headers (###), bullet points, and clinical notes..."
-                      className="w-full px-3 py-2 rounded-xl text-xs font-mono bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-amber-500"
-                    />
+                  {/* Rich Article Body with Toolbar & Live Preview */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-xs font-bold text-slate-300">
+                        Full Article Body ({activeTab.toUpperCase()})
+                      </label>
+                      <div className="flex items-center gap-1 p-0.5 rounded-lg bg-slate-800 text-[11px] font-bold">
+                        <button
+                          type="button"
+                          onClick={() => setContentViewMode('write')}
+                          className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-all ${
+                            contentViewMode === 'write'
+                              ? 'bg-amber-500 text-slate-950 shadow-sm'
+                              : 'text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          <Edit2 size={12} />
+                          <span>Write & Format</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setContentViewMode('preview')}
+                          className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-all ${
+                            contentViewMode === 'preview'
+                              ? 'bg-amber-500 text-slate-950 shadow-sm'
+                              : 'text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          <Eye size={12} />
+                          <span>Live Preview</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {contentViewMode === 'write' ? (
+                      <div>
+                        <RichContentToolbar
+                          textareaRef={textareaRef}
+                          value={translationsData[activeTab].content}
+                          onChange={(val) =>
+                            setTranslationsData({
+                              ...translationsData,
+                              [activeTab]: {
+                                ...translationsData[activeTab],
+                                content: val,
+                              },
+                            })
+                          }
+                          accent="amber"
+                        />
+                        <textarea
+                          ref={textareaRef}
+                          rows={10}
+                          value={translationsData[activeTab].content}
+                          onChange={(e) =>
+                            setTranslationsData({
+                              ...translationsData,
+                              [activeTab]: {
+                                ...translationsData[activeTab],
+                                content: e.target.value,
+                              },
+                            })
+                          }
+                          placeholder="Author guide with formatted headings (###), clinical tables, bullet points, and embedded images..."
+                          className="w-full px-3 py-2.5 rounded-b-xl text-xs font-mono bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-amber-500 leading-relaxed"
+                        />
+                      </div>
+                    ) : (
+                      <div className="p-4 rounded-xl bg-slate-900 border border-slate-700 min-h-[220px] max-h-[380px] overflow-y-auto">
+                        <MarkdownRenderer content={translationsData[activeTab].content} />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
