@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { firebaseAdmin } from '@/lib/firebase-admin';
+import { verifyGoogleIdToken, signSessionToken } from '@/lib/auth';
 import { db } from '@/db';
 import { adminUsers } from '@/db/schema';
 import { eq } from 'drizzle-orm';
@@ -25,9 +25,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing idToken.' }, { status: 400 });
     }
 
-    // Verify token with Firebase
-    const decodedToken = await firebaseAdmin.auth().verifyIdToken(idToken);
-    const { uid, email } = decodedToken;
+    // Verify token with Google Identity
+    const { uid, email } = await verifyGoogleIdToken(idToken);
 
     if (!email) {
       return NextResponse.json({ error: 'Authentication token has no email.' }, { status: 400 });
@@ -70,9 +69,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create session cookie valid for 5 days
+    // Create server-signed session cookie valid for 5 days
     const expiresIn = 60 * 60 * 24 * 5 * 1000;
-    const sessionCookie = await firebaseAdmin.auth().createSessionCookie(idToken, { expiresIn });
+    const sessionCookie = signSessionToken({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      uid: user.firebaseUid,
+    });
 
     const response = NextResponse.json({
       success: true,
