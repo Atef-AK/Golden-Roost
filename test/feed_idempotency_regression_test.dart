@@ -3,7 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:golden_roost/core/database/database_helper.dart';
 import 'package:golden_roost/core/sync/sync_service.dart';
+import 'package:golden_roost/core/utils/calculations.dart';
 import 'package:golden_roost/models/feed.dart';
+import 'package:golden_roost/models/flock.dart';
+import 'package:golden_roost/models/egg_record.dart';
+import 'package:golden_roost/models/finance.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +29,8 @@ void main() {
       dbHelper = DatabaseHelper.instance;
       final db = await dbHelper.database;
       // Clear relevant tables for clean isolated test run
+      await db.delete('flocks');
+      await db.delete('egg_logs');
       await db.delete('feed_transactions');
       await db.delete('feed_inventory');
       await db.delete('finances');
@@ -265,6 +271,136 @@ void main() {
       expect(result.errorMessage, contains('No remote tombstone adapter is configured'));
       final pendingTombstones = await DatabaseHelper.instance.getPendingTombstones();
       expect(pendingTombstones.any((t) => t.recordId == 'flock_tombstone_null_adapter'), isTrue);
+    });
+
+    test('Full lifecycle: flock, eggs, feed, finances, and failed sync keeps all records 100% intact', () async {
+      final now = DateTime.now();
+
+      // 1. Create a Flock
+      final flock = Flock(
+        id: 'flock_e2e_001',
+        name: 'Barn A Layers',
+        species: 'chicken',
+        breed: 'Lohmann Brown',
+        purpose: 'layers',
+        acquisitionDate: now.subtract(const Duration(days: 150)),
+        startCount: 500,
+        currentCount: 500,
+        femaleCount: 480,
+        maleCount: 20,
+        createdAt: now,
+      );
+      await DatabaseHelper.instance.insertFlock(flock);
+
+      // Verify flock is persisted
+      var flocks = await DatabaseHelper.instance.getFlocks();
+      expect(flocks.any((f) => f.id == 'flock_e2e_001'), isTrue);
+
+      // 2. Record Feed Inventory & Purchase
+      final feedItem = FeedItem(
+        id: 'feed_layer_mash',
+        name: 'Layer Mash Phase 1',
+        feedType: 'layer',
+        currentStockKg: 100.0,
+        lowStockThresholdKg: 20.0,
+        bagWeightKg: 50.0,
+        costPerBag: 35.0,
+        notes: 'Commercial mash',
+        updatedAt: now,
+      );
+      await DatabaseHelper.instance.insertFeedItem(feedItem);
+
+      final purchaseTx = FeedTransaction(
+        id: 'tx_buy_feed_101',
+        feedId: 'feed_layer_mash',
+        date: now,
+        type: 'purchase',
+        quantityKg: 200.0,
+        cost: 140.0,
+        notes: 'Bought 4 bags of 50kg',
+        createdAt: now,
+      );
+      await DatabaseHelper.instance.recordFeedTransaction(purchaseTx);
+
+      // Verify stock updated to 300kg
+      var inventory = await DatabaseHelper.instance.getFeedInventory();
+      var feed = inventory.firstWhere((f) => f.id == 'feed_layer_mash');
+      expect(feed.currentStockKg, 300.0);
+
+      // 3. Record Feed Consumption
+      final consumptionTx = FeedTransaction(
+        id: 'tx_feed_flock_102',
+        feedId: 'feed_layer_mash',
+        flockId: 'flock_e2e_001',
+        date: now,
+        type: 'consumption',
+        quantityKg: 60.0,
+        cost: 42.0,
+        notes: 'Daily feed for Barn A',
+        createdAt: now,
+      );
+      await DatabaseHelper.instance.recordFeedTransaction(consumptionTx);
+
+      // Stock should now be 240kg
+      inventory = await DatabaseHelper.instance.getFeedInventory();
+      feed = inventory.firstWhere((f) => f.id == 'feed_layer_mash');
+      expect(feed.currentStockKg, 240.0);
+
+      // 4. Record Egg Production
+      final eggLog = EggLog(
+        id: 'egg_log_103',
+        flockId: 'flock_e2e_001',
+        date: now,
+        totalEggs: 456,
+        crackedEggs: 6,
+        usableEggs: 450,
+        notes: 'Morning egg collection',
+        createdAt: now,
+      );
+      await DatabaseHelper.instance.insertEggLog(eggLog);
+
+      final layingRate = FarmCalculations.calculateLayingRate(
+        eggsCollected: eggLog.totalEggs,
+        femaleBirds: flock.femaleCount,
+      );
+      expect(layingRate, closeTo(95.0, 0.1));
+
+      // 5. Record Finances
+      final eggSale = FinancialTransaction(
+        id: 'fin_sale_104',
+        type: 'income',
+        category: 'egg_sales',
+        amount: 180.0,
+        date: now,
+        flockId: 'flock_e2e_001',
+        notes: 'Sold 15 crates of eggs',
+        createdAt: now,
+      );
+      await DatabaseHelper.instance.insertFinance(eggSale);
+
+      // 6. Simulate Offline Sync (disconnected from cloud)
+      final syncResult = await SyncService.instance.synchronize(
+        isCloudConnected: false,
+      );
+      expect(syncResult.status, equals(SyncStatus.offline));
+
+      // 7. CRITICAL VERIFICATION: Ensure all farm records remain 100% intact after offline attempt
+      flocks = await DatabaseHelper.instance.getFlocks();
+      expect(flocks.any((f) => f.id == 'flock_e2e_001'), isTrue);
+
+      inventory = await DatabaseHelper.instance.getFeedInventory();
+      feed = inventory.firstWhere((f) => f.id == 'feed_layer_mash');
+      expect(feed.currentStockKg, 240.0);
+
+      final transactions = await DatabaseHelper.instance.getFeedTransactions(feedId: 'feed_layer_mash');
+      expect(transactions.length, 2);
+
+      final eggLogs = await DatabaseHelper.instance.getEggLogs(flockId: 'flock_e2e_001');
+      expect(eggLogs.length, 1);
+      expect(eggLogs.first.totalEggs, 456);
+
+      final finances = await DatabaseHelper.instance.getFinances();
+      expect(finances.any((f) => f.id == 'fin_sale_104'), isTrue);
     });
   });
 }
