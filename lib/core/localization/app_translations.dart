@@ -655,6 +655,18 @@ class AppTranslations {
       'eggs_sale_removed': 'Egg sale removed!',
       'splash_subtitle': 'Enterprise Agri-Tech Platform',
       'splash_loading': 'Calibrating flock data & feed inventory...',
+      'onboarding_skip': 'Skip',
+      'onboarding_next': 'Next',
+      'onboarding_get_started': 'Get Started',
+      'onboarding_title_1': 'Manage Your Farm',
+      'onboarding_desc_1':
+          'Track layer, broiler, and quail flocks with real-time age, population, and housing insights.',
+      'onboarding_title_2': 'Track Eggs & Feed',
+      'onboarding_desc_2':
+          'Log daily egg harvests, manage feed inventories, and receive low-stock runway alerts.',
+      'onboarding_title_3': 'Hatch & Learn',
+      'onboarding_desc_3':
+          'Monitor incubation candling milestones and access veterinary care and equipment guides.',
     },
     'fr': {
       'app_title': 'Golden Roost',
@@ -1276,6 +1288,18 @@ class AppTranslations {
       'eggs_sale_removed': 'Vente d\'œufs supprimée !',
       'splash_subtitle': 'Plateforme Agri-Tech Professionnelle',
       'splash_loading': 'Calibrage des données et stocks d\'aliments...',
+      'onboarding_skip': 'Passer',
+      'onboarding_next': 'Suivant',
+      'onboarding_get_started': 'Démarrer',
+      'onboarding_title_1': 'Gérez Votre Exploitation',
+      'onboarding_desc_1':
+          'Suivez vos troupeaux de pondeuses, poulets et cailles avec indicateurs d\'âge, effectif et bâtiment.',
+      'onboarding_title_2': 'Suivi des Œufs & Aliments',
+      'onboarding_desc_2':
+          'Enregistrez la ponte quotidienne, gérez vos stocks d\'aliments et prévenez les ruptures.',
+      'onboarding_title_3': 'Incubation & Savoir',
+      'onboarding_desc_3':
+          'Contrôlez le mirage et l\'éclosion et accédez aux guides vétérinaires et matériel.',
     },
     'ar': {
       'app_title': 'غولدن روست',
@@ -1885,6 +1909,18 @@ class AppTranslations {
       'eggs_sale_removed': 'تم حذف سجل بيع البيض بنجاح!',
       'splash_subtitle': 'المنصة الذكية المتكاملة لإدارة المداجن',
       'splash_loading': 'جارٍ معايرة بيانات القطعان واحتياجات العلف...',
+      'onboarding_skip': 'تخطي',
+      'onboarding_next': 'التالي',
+      'onboarding_get_started': 'ابدأ الآن',
+      'onboarding_title_1': 'إدارة متكاملة لمزرعتك',
+      'onboarding_desc_1':
+          'متابعة دقيقة لقطعان البياض واللحم والسمان مع حساب الأعمار والعدد وحالة الحظائر لحظياً.',
+      'onboarding_title_2': 'متابعة البيض والأعلاف',
+      'onboarding_desc_2':
+          'تسجيل جمع البيض اليومي، إدارة مخزون الأعلاف وتنبيهات الاستهلاك قبل النفاذ.',
+      'onboarding_title_3': 'التفريخ والمعرفة الزراعية',
+      'onboarding_desc_3':
+          'مراقبة مراحل التحضين والتفقيس والفحص الضوئي مع دليل شامل للرعاية البيطرية والمعدات.',
     },
     'es': {
       'app_title': 'Golden Roost',
@@ -2466,6 +2502,18 @@ class AppTranslations {
       'eggs_sale_removed': '¡Registro de venta de huevos eliminado!',
       'splash_subtitle': 'Plataforma Inteligente de Gestión Avícola',
       'splash_loading': 'Calibrando datos de lotes e inventario...',
+      'onboarding_skip': 'Omitir',
+      'onboarding_next': 'Siguiente',
+      'onboarding_get_started': 'Comenzar',
+      'onboarding_title_1': 'Gestiona tu Granja',
+      'onboarding_desc_1':
+          'Controla lotes de ponedoras, pollos y codornices con edad, población y ubicación en tiempo real.',
+      'onboarding_title_2': 'Control de Huevos y Alimento',
+      'onboarding_desc_2':
+          'Registra la recolección diaria de huevos, gestiona inventarios de alimento y alertas de stock.',
+      'onboarding_title_3': 'Incubación y Conocimiento',
+      'onboarding_desc_3':
+          'Supervisa el desarrollo embrionario y la eclosión, y accede a guías veterinarias y de equipos.',
     },
   };
 
