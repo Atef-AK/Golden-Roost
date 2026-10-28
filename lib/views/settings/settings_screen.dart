@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../core/database/database_helper.dart';
@@ -192,6 +193,8 @@ class SettingsScreen extends ConsumerWidget {
                           ? 'العربية (Arabic - RTL)'
                           : settings.language == 'fr'
                           ? 'Français (French)'
+                          : settings.language == 'es'
+                          ? 'Español (Spanish)'
                           : 'English',
                     ),
                     trailing: const Icon(Icons.chevron_right, size: 20),
@@ -258,20 +261,23 @@ class SettingsScreen extends ConsumerWidget {
                     icon: const Icon(Icons.notifications_active_outlined),
                     label: Text(context.tr('settings_test_notification')),
                     onPressed: () async {
-                      final reminderDesc = context.tr('settings_reminders_desc');
-                      final testNotifMsg = context.tr('settings_test_notification');
-                      await NotificationService.instance.requestPermissions();
-                      await NotificationService.instance.showInstantNotification(
-                        id: 999,
-                        title: 'Golden Roost',
-                        body: reminderDesc,
+                      final reminderDesc = context.tr(
+                        'settings_reminders_desc',
                       );
+                      final testNotifMsg = context.tr(
+                        'settings_test_notification',
+                      );
+                      await NotificationService.instance.requestPermissions();
+                      await NotificationService.instance
+                          .showInstantNotification(
+                            id: 999,
+                            title: 'Golden Roost',
+                            body: reminderDesc,
+                          );
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(testNotifMsg),
-                          ),
-                        );
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text(testNotifMsg)));
                       }
                     },
                   ),
@@ -429,9 +435,7 @@ class SettingsScreen extends ConsumerWidget {
                         child: OutlinedButton.icon(
                           style: OutlinedButton.styleFrom(
                             foregroundColor: const Color(0xFFDC2626),
-                            side: const BorderSide(
-                              color: Color(0xFFDC2626),
-                            ),
+                            side: const BorderSide(color: Color(0xFFDC2626)),
                           ),
                           icon: const Icon(
                             Icons.phonelink_erase,
@@ -666,6 +670,57 @@ class SettingsScreen extends ConsumerWidget {
                 ],
               ),
             ),
+            const SizedBox(height: 16),
+
+            // 9. About Golden Roost & Onboarding Tour
+            PremiumCard(
+              padding: const EdgeInsets.all(18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.forestEmerald.withAlpha(20),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.info_outline_rounded,
+                          color: AppColors.forestEmerald,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Text(
+                          'Golden Roost 2.0',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(
+                      Icons.explore_outlined,
+                      color: AppColors.forestEmerald,
+                    ),
+                    title: const Text('View Onboarding Tour'),
+                    subtitle: const Text(
+                      'Revisit the 3-step agritech feature guide',
+                    ),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => context.push('/onboarding'),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -700,7 +755,9 @@ class SettingsScreen extends ConsumerWidget {
             child: const Text('Cancel'),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.semanticError),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.semanticError,
+            ),
             onPressed: () async {
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
@@ -726,7 +783,9 @@ class SettingsScreen extends ConsumerWidget {
         title: Text(context.tr('settings_farm_name')),
         content: TextField(
           controller: ctrl,
-          decoration: InputDecoration(labelText: context.tr('settings_farm_name')),
+          decoration: InputDecoration(
+            labelText: context.tr('settings_farm_name'),
+          ),
         ),
         actions: [
           TextButton(
@@ -842,6 +901,17 @@ class SettingsScreen extends ConsumerWidget {
                   Navigator.pop(ctx);
                 },
               ),
+              ListTile(
+                leading: const Text('🇪🇸', style: TextStyle(fontSize: 24)),
+                title: const Text('Español (Spanish)'),
+                trailing: currentLang == 'es'
+                    ? const Icon(Icons.check, color: AppColors.primaryTeal)
+                    : null,
+                onTap: () {
+                  ref.read(settingsProvider.notifier).updateLanguage('es');
+                  Navigator.pop(ctx);
+                },
+              ),
             ],
           ),
         ),
@@ -864,9 +934,7 @@ class SettingsScreen extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(context.tr('settings_clear_sample')),
-        content: Text(
-          context.tr('settings_clear_sample_confirm'),
-        ),
+        content: Text(context.tr('settings_clear_sample_confirm')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -902,9 +970,7 @@ class SettingsScreen extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(context.tr('settings_clear_all_data')),
-        content: Text(
-          context.tr('settings_clear_all_confirm'),
-        ),
+        content: Text(context.tr('settings_clear_all_confirm')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),

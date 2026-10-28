@@ -9,9 +9,11 @@ class FarmSettings {
   final bool remindersEnabled;
   final String reminderTime; // e.g. "08:00"
   final String themeMode; // 'system', 'light', 'dark'
-  final bool autoFeedDeduction; // Default false: forecasting never silently deducts stock
+  final bool
+  autoFeedDeduction; // Default false: forecasting never silently deducts stock
   final bool articleNotificationsEnabled; // Educational and health updates
-  final bool marketingNotificationsEnabled; // Optional promotional announcements
+  final bool
+  marketingNotificationsEnabled; // Optional promotional announcements
   final bool adsEnabled; // Global toggle for banner/monetization
   final bool cloudSyncEnabled; // Optional cloud sync
   final DateTime? lastSyncTimestamp;

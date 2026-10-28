@@ -67,8 +67,9 @@ class FarmCalculations {
     required int ageWeeks,
     int? ageDays,
   }) {
-    final effectiveWeeks =
-        ageWeeks > 0 ? ageWeeks : ((ageDays ?? 0) / 7).floor();
+    final effectiveWeeks = ageWeeks > 0
+        ? ageWeeks
+        : ((ageDays ?? 0) / 7).floor();
     final sp = species.toLowerCase().trim();
     final pur = purpose.toLowerCase().trim();
 

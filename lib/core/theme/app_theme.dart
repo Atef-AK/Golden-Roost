@@ -5,50 +5,57 @@ import 'package:flutter/material.dart';
 /// Token *names* are kept stable (many screens reference them directly);
 /// only their values were refined for a modern, enterprise-grade palette.
 class AppColors {
-  // Brand Palette - Enterprise Emerald
-  static const Color primaryTeal = Color(0xFF0B7A62);
-  static const Color primaryTealLight = Color(0xFF14A383);
-  static const Color primaryTealDark = Color(0xFF075A49);
-  static const Color primaryTealSurface = Color(0xFFE6F4F0);
+  // Brand Palette - Golden Roost 2.0 Forest Emerald & Golden Harvest
+  static const Color forestEmerald = Color(0xFF176B4D);
+  static const Color deepForest = Color(0xFF104735);
+  static const Color freshLeaf = Color(0xFF79B85A);
+  static const Color goldenHarvest = Color(0xFFE4AF49);
+  static const Color warmIvory = Color(0xFFF8F7F1);
+
+  static const Color primaryTeal = forestEmerald;
+  static const Color primaryTealLight = Color(0xFF229E73);
+  static const Color primaryTealDark = deepForest;
+  static const Color primaryTealSurface = Color(0xFFE8F5F0);
 
   // Ink (used for hero surfaces & dark accents)
-  static const Color darkGraphite = Color(0xFF0B1324);
-  static const Color darkGraphiteCard = Color(0xFF131C2E);
-  static const Color darkGraphiteBorder = Color(0xFF243047);
+  static const Color darkGraphite = Color(0xFF0A120E);
+  static const Color darkGraphiteCard = Color(0xFF121E18);
+  static const Color darkGraphiteBorder = Color(0xFF23352B);
 
-  static const Color limeAccent = Color(0xFFA3D93B);
-  static const Color limeAccentMuted = Color(0xFFD4EDA0);
-  static const Color limeAccentSurface = Color(0xFFF3FAE6);
+  static const Color limeAccent = freshLeaf;
+  static const Color limeAccentMuted = Color(0xFFCBE8B8);
+  static const Color limeAccentSurface = Color(0xFFF3F9EE);
 
-  // Light Neutrals (slate scale)
-  static const Color pageBackgroundLight = Color(0xFFF5F7FA);
+  // Light Neutrals (Warm Ivory & Soft Sage)
+  static const Color pageBackgroundLight = Color(0xFFF8F7F1);
   static const Color cardBackgroundLight = Color(0xFFFFFFFF);
-  static const Color borderLight = Color(0xFFE5E8ED);
-  static const Color textPrimaryLight = Color(0xFF0F172A);
-  static const Color textSecondaryLight = Color(0xFF5A6478);
-  static const Color textTertiaryLight = Color(0xFF97A0B0);
+  static const Color borderLight = Color(0xFFE4E9E1);
+  static const Color textPrimaryLight = Color(0xFF1B2821);
+  static const Color textSecondaryLight = Color(0xFF55665C);
+  static const Color textTertiaryLight = Color(0xFF86968D);
 
-  // Dark Neutrals
-  static const Color pageBackgroundDark = Color(0xFF090D14);
-  static const Color cardBackgroundDark = Color(0xFF111823);
-  static const Color borderDark = Color(0xFF212B38);
-  static const Color textPrimaryDark = Color(0xFFF1F4F8);
-  static const Color textSecondaryDark = Color(0xFFA0AABA);
-  static const Color textTertiaryDark = Color(0xFF6B7687);
+  // Dark Neutrals (Deep Forest Charcoal & Soft Sage)
+  static const Color pageBackgroundDark = Color(0xFF0A120E);
+  static const Color cardBackgroundDark = Color(0xFF121E18);
+  static const Color surfaceElevatedDark = Color(0xFF192820);
+  static const Color borderDark = Color(0xFF23352B);
+  static const Color textPrimaryDark = Color(0xFFF4F7F5);
+  static const Color textSecondaryDark = Color(0xFFA2B3A9);
+  static const Color textTertiaryDark = Color(0xFF6A7D73);
 
   // Functional Semantic Colors
-  static const Color success = Color(0xFF119468);
-  static const Color successSurface = Color(0xFFE7F6EF);
-  static const Color warning = Color(0xFFD97A06);
-  static const Color warningSurface = Color(0xFFFDF3E5);
-  static const Color error = Color(0xFFE0464B);
-  static const Color errorSurface = Color(0xFFFDECEC);
-  static const Color info = Color(0xFF2F6FE4);
-  static const Color infoSurface = Color(0xFFEAF1FD);
+  static const Color success = Color(0xFF168F64);
+  static const Color successSurface = Color(0xFFE7F6F0);
+  static const Color warning = Color(0xFFD97706);
+  static const Color warningSurface = Color(0xFFFDF6EB);
+  static const Color error = Color(0xFFDC2626);
+  static const Color errorSurface = Color(0xFFFDF0F0);
+  static const Color info = Color(0xFF2563EB);
+  static const Color infoSurface = Color(0xFFEFF5FE);
 
   // Backward-compatible alias helpers
-  static const Color primary = primaryTeal;
-  static const Color primaryDark = primaryTealDark;
+  static const Color primary = forestEmerald;
+  static const Color primaryDark = deepForest;
   static const Color primaryLight = primaryTealLight;
   static const Color primarySage = limeAccentMuted;
   static const Color accentWarm = warningSurface;
@@ -65,9 +72,11 @@ class AppColors {
   static const Color cardDark = cardBackgroundDark;
   static const Color surfaceBorderDark = borderDark;
 
-  static const Color accentAmber = warning;
-  static const Color accentGold = warning;
+  static const Color accentAmber = goldenHarvest;
+  static const Color accentGold = goldenHarvest;
   static const Color accentLime = limeAccent;
+  static const Color mainInk = textPrimaryLight;
+  static const Color secondaryText = textSecondaryLight;
   static const Color textDark = textPrimaryLight;
   static const Color textMutedLight = textSecondaryLight;
   static const Color textLight = textPrimaryDark;
@@ -77,14 +86,14 @@ class AppColors {
   static const LinearGradient brandGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF075A49), Color(0xFF0B7A62), Color(0xFF12957A)],
+    colors: [Color(0xFF104735), Color(0xFF176B4D), Color(0xFF229E73)],
   );
 
-  /// Deep ink gradient for dark hero surfaces.
+  /// Deep forest ink gradient for dark hero surfaces.
   static const LinearGradient inkGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF0B1324), Color(0xFF0F2A2A), Color(0xFF0B5546)],
+    colors: [Color(0xFF0A120E), Color(0xFF10281F), Color(0xFF176B4D)],
   );
 }
 
@@ -215,8 +224,12 @@ class AppTheme {
     final primaryContainer = isDark
         ? const Color(0xFF0E3B33)
         : AppColors.primaryTealSurface;
-    final inputFill = isDark ? const Color(0xFF0D131C) : const Color(0xFFF8FAFC);
-    final mutedFill = isDark ? const Color(0xFF18212D) : const Color(0xFFF1F4F8);
+    final inputFill = isDark
+        ? const Color(0xFF0D131C)
+        : const Color(0xFFF8FAFC);
+    final mutedFill = isDark
+        ? const Color(0xFF18212D)
+        : const Color(0xFFF1F4F8);
 
     final colorScheme = ColorScheme(
       brightness: brightness,
@@ -329,10 +342,7 @@ class AppTheme {
         }),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           final sel = states.contains(WidgetState.selected);
-          return IconThemeData(
-            size: 23,
-            color: sel ? primary : textSecondary,
-          );
+          return IconThemeData(size: 23, color: sel ? primary : textSecondary);
         }),
       ),
       navigationRailTheme: NavigationRailThemeData(
@@ -420,7 +430,10 @@ class AppTheme {
           minimumSize: const Size(0, 40),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           shape: buttonShape,
-          textStyle: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600),
+          textStyle: const TextStyle(
+            fontSize: 13.5,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
       iconButtonTheme: IconButtonThemeData(
@@ -598,7 +611,9 @@ class AppTheme {
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: isDark ? const Color(0xFF1E2836) : AppColors.darkGraphite,
+        backgroundColor: isDark
+            ? const Color(0xFF1E2836)
+            : AppColors.darkGraphite,
         contentTextStyle: TextStyle(
           fontFamily: font,
           color: Colors.white,

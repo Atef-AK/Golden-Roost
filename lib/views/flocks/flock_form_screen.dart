@@ -134,7 +134,10 @@ class _FlockFormScreenState extends ConsumerState<FlockFormScreen> {
                 decoration: InputDecoration(
                   labelText: context.tr('flocks_name'),
                   hintText: context.tr('flocks_name_hint'),
-                  prefixIcon: const Icon(AppIcons.birds, color: AppColors.primaryTeal),
+                  prefixIcon: const Icon(
+                    AppIcons.birds,
+                    color: AppColors.primaryTeal,
+                  ),
                 ),
                 validator: (val) {
                   if (val == null || val.trim().isEmpty) {
@@ -151,14 +154,20 @@ class _FlockFormScreenState extends ConsumerState<FlockFormScreen> {
                 initialValue: _species,
                 decoration: InputDecoration(
                   labelText: context.tr('flocks_species'),
-                  prefixIcon: const Icon(AppIcons.chicken, color: AppColors.primaryTeal),
+                  prefixIcon: const Icon(
+                    AppIcons.chicken,
+                    color: AppColors.primaryTeal,
+                  ),
                 ),
                 items: [
                   DropdownMenuItem(
                     value: 'chicken',
                     child: Row(
                       children: [
-                        const ChickenIcon(size: 18, color: AppColors.primaryTeal),
+                        const ChickenIcon(
+                          size: 18,
+                          color: AppColors.primaryTeal,
+                        ),
                         const SizedBox(width: 8),
                         Text(context.tr('species_chicken')),
                       ],
@@ -168,7 +177,11 @@ class _FlockFormScreenState extends ConsumerState<FlockFormScreen> {
                     value: 'quail',
                     child: Row(
                       children: [
-                        const Icon(AppIcons.quail, size: 18, color: Color(0xFFD97706)),
+                        const Icon(
+                          AppIcons.quail,
+                          size: 18,
+                          color: Color(0xFFD97706),
+                        ),
                         const SizedBox(width: 8),
                         Text(context.tr('species_quail')),
                       ],
@@ -178,7 +191,11 @@ class _FlockFormScreenState extends ConsumerState<FlockFormScreen> {
                     value: 'duck',
                     child: Row(
                       children: [
-                        const Icon(AppIcons.duck, size: 18, color: Color(0xFF0284C7)),
+                        const Icon(
+                          AppIcons.duck,
+                          size: 18,
+                          color: Color(0xFF0284C7),
+                        ),
                         const SizedBox(width: 8),
                         Text(context.tr('species_duck')),
                       ],
@@ -188,7 +205,11 @@ class _FlockFormScreenState extends ConsumerState<FlockFormScreen> {
                     value: 'turkey',
                     child: Row(
                       children: [
-                        const Icon(AppIcons.turkey, size: 18, color: Color(0xFF9A3412)),
+                        const Icon(
+                          AppIcons.turkey,
+                          size: 18,
+                          color: Color(0xFF9A3412),
+                        ),
                         const SizedBox(width: 8),
                         Text(context.tr('species_turkey')),
                       ],
@@ -198,7 +219,11 @@ class _FlockFormScreenState extends ConsumerState<FlockFormScreen> {
                     value: 'goose',
                     child: Row(
                       children: [
-                        const Icon(Icons.flutter_dash_outlined, size: 18, color: Color(0xFF059669)),
+                        const Icon(
+                          Icons.flutter_dash_outlined,
+                          size: 18,
+                          color: Color(0xFF059669),
+                        ),
                         const SizedBox(width: 8),
                         Text(context.tr('species_goose')),
                       ],
@@ -208,7 +233,11 @@ class _FlockFormScreenState extends ConsumerState<FlockFormScreen> {
                     value: 'other',
                     child: Row(
                       children: [
-                        const Icon(AppIcons.birds, size: 18, color: Colors.blueGrey),
+                        const Icon(
+                          AppIcons.birds,
+                          size: 18,
+                          color: Colors.blueGrey,
+                        ),
                         const SizedBox(width: 8),
                         Text(context.tr('species_other')),
                       ],
@@ -265,7 +294,11 @@ class _FlockFormScreenState extends ConsumerState<FlockFormScreen> {
                           value: 'layers',
                           child: Row(
                             children: [
-                              const Icon(AppIcons.layers, size: 16, color: AppColors.warning),
+                              const Icon(
+                                AppIcons.layers,
+                                size: 16,
+                                color: AppColors.warning,
+                              ),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
@@ -280,7 +313,11 @@ class _FlockFormScreenState extends ConsumerState<FlockFormScreen> {
                           value: 'meat',
                           child: Row(
                             children: [
-                              const Icon(AppIcons.broilers, size: 16, color: AppColors.primaryTeal),
+                              const Icon(
+                                AppIcons.broilers,
+                                size: 16,
+                                color: AppColors.primaryTeal,
+                              ),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
@@ -295,7 +332,11 @@ class _FlockFormScreenState extends ConsumerState<FlockFormScreen> {
                           value: 'breeders',
                           child: Row(
                             children: [
-                              const Icon(Icons.favorite_outline, size: 16, color: Color(0xFFE11D48)),
+                              const Icon(
+                                Icons.favorite_outline,
+                                size: 16,
+                                color: Color(0xFFE11D48),
+                              ),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
@@ -310,7 +351,11 @@ class _FlockFormScreenState extends ConsumerState<FlockFormScreen> {
                           value: 'mixed',
                           child: Row(
                             children: [
-                              const Icon(Icons.diversity_3_outlined, size: 16, color: Color(0xFF8B5CF6)),
+                              const Icon(
+                                Icons.diversity_3_outlined,
+                                size: 16,
+                                color: Color(0xFF8B5CF6),
+                              ),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
@@ -351,7 +396,9 @@ class _FlockFormScreenState extends ConsumerState<FlockFormScreen> {
                           context: context,
                           initialDate: _hatchDate ?? _acquisitionDate,
                           firstDate: DateTime(2000),
-                          lastDate: DateTime.now().add(const Duration(days: 30)),
+                          lastDate: DateTime.now().add(
+                            const Duration(days: 30),
+                          ),
                         );
                         if (picked != null) {
                           setState(() {
@@ -362,17 +409,29 @@ class _FlockFormScreenState extends ConsumerState<FlockFormScreen> {
                       child: InputDecorator(
                         decoration: InputDecoration(
                           labelText: context.tr('flocks_hatch_date'),
-                          prefixIcon: const Icon(Icons.cake_outlined, color: AppColors.primaryTeal),
+                          prefixIcon: const Icon(
+                            Icons.cake_outlined,
+                            color: AppColors.primaryTeal,
+                          ),
                           helperText: context.tr('flocks_hatch_date_hint'),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              DateFormat('yyyy-MM-dd').format(_hatchDate ?? _acquisitionDate),
-                              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                              DateFormat(
+                                'yyyy-MM-dd',
+                              ).format(_hatchDate ?? _acquisitionDate),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14,
+                              ),
                             ),
-                            const Icon(Icons.edit_calendar_rounded, size: 18, color: AppColors.primaryTeal),
+                            const Icon(
+                              Icons.edit_calendar_rounded,
+                              size: 18,
+                              color: AppColors.primaryTeal,
+                            ),
                           ],
                         ),
                       ),
@@ -382,17 +441,27 @@ class _FlockFormScreenState extends ConsumerState<FlockFormScreen> {
                     Builder(
                       builder: (ctx) {
                         final effective = _hatchDate ?? _acquisitionDate;
-                        final days = DateTime.now().difference(effective).inDays.clamp(0, 99999);
+                        final days = DateTime.now()
+                            .difference(effective)
+                            .inDays
+                            .clamp(0, 99999);
                         final weeks = (days / 7).floor();
                         return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.primaryTeal.withAlpha(20),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.timelapse_rounded, size: 18, color: AppColors.primaryTeal),
+                              const Icon(
+                                Icons.timelapse_rounded,
+                                size: 18,
+                                color: AppColors.primaryTeal,
+                              ),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
@@ -443,7 +512,10 @@ class _FlockFormScreenState extends ConsumerState<FlockFormScreen> {
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   labelText: context.tr('flocks_start_count'),
-                  prefixIcon: const Icon(AppIcons.birds, color: AppColors.primaryTeal),
+                  prefixIcon: const Icon(
+                    AppIcons.birds,
+                    color: AppColors.primaryTeal,
+                  ),
                 ),
                 onChanged: (_) => _calculateTotalCost(),
                 validator: (val) {
@@ -528,7 +600,10 @@ class _FlockFormScreenState extends ConsumerState<FlockFormScreen> {
                       decoration: InputDecoration(
                         labelText: context.tr('flocks_housing'),
                         hintText: context.tr('flocks_housing_hint'),
-                        prefixIcon: const Icon(AppIcons.coop, color: Color(0xFF8B5CF6)),
+                        prefixIcon: const Icon(
+                          AppIcons.coop,
+                          color: Color(0xFF8B5CF6),
+                        ),
                       ),
                     ),
                   ),

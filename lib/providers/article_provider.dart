@@ -5,10 +5,11 @@ import '../core/database/database_helper.dart';
 import '../core/database/sample_articles.dart';
 import '../models/article.dart';
 
-final articlesProvider =
-    StateNotifierProvider<ArticlesNotifier, List<Article>>((ref) {
-      return ArticlesNotifier();
-    });
+final articlesProvider = StateNotifierProvider<ArticlesNotifier, List<Article>>(
+  (ref) {
+    return ArticlesNotifier();
+  },
+);
 
 final articleCategoryFilterProvider = StateProvider<String?>((ref) => null);
 final articleSearchQueryProvider = StateProvider<String>((ref) => '');
@@ -83,7 +84,8 @@ class ArticlesNotifier extends StateNotifier<List<Article>> {
               if (t['locale'] == 'en') {
                 titleEn = t['title'] ?? '';
                 summaryEn = t['summary'] ?? '';
-                if (t['content'] != null && (t['content'] as String).isNotEmpty) {
+                if (t['content'] != null &&
+                    (t['content'] as String).isNotEmpty) {
                   bodyEn = t['content'];
                 }
               } else if (t['locale'] == 'fr') {
@@ -103,7 +105,9 @@ class ArticlesNotifier extends StateNotifier<List<Article>> {
               titleEn: titleEn.isNotEmpty ? titleEn : (item['title'] ?? ''),
               titleFr: titleFr,
               titleAr: titleAr,
-              summaryEn: summaryEn.isNotEmpty ? summaryEn : (item['summary'] ?? ''),
+              summaryEn: summaryEn.isNotEmpty
+                  ? summaryEn
+                  : (item['summary'] ?? ''),
               summaryFr: summaryFr,
               summaryAr: summaryAr,
               bodyEn: bodyEn,

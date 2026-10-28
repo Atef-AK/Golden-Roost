@@ -41,8 +41,8 @@ class Flock {
     this.notes = '',
     this.isArchived = false,
     required this.createdAt,
-  })  : startMaleCount = startMaleCount ?? maleCount,
-        startFemaleCount = startFemaleCount ?? femaleCount;
+  }) : startMaleCount = startMaleCount ?? maleCount,
+       startFemaleCount = startFemaleCount ?? femaleCount;
 
   DateTime get effectiveBirthDate => hatchDate ?? acquisitionDate;
 
@@ -52,11 +52,15 @@ class Flock {
   /// Females at or past maturity (~18 weeks for chickens, ~6 weeks for quail) capable of laying
   int get eligibleLayingFemales {
     final pur = purpose.toLowerCase().trim();
-    if (pur.contains('meat') || pur.contains('broiler') || pur.contains('chair')) {
+    if (pur.contains('meat') ||
+        pur.contains('broiler') ||
+        pur.contains('chair')) {
       return 0;
     }
     final sp = species.toLowerCase().trim();
-    final minLayingWeeks = (sp.contains('quail') || sp.contains('caille')) ? 6 : 18;
+    final minLayingWeeks = (sp.contains('quail') || sp.contains('caille'))
+        ? 6
+        : 18;
     if (ageInWeeks < minLayingWeeks) return 0;
     return femaleCount;
   }

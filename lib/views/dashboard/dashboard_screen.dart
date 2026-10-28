@@ -37,28 +37,30 @@ class DashboardScreen extends ConsumerWidget {
         titleSpacing: 16,
         title: Row(
           children: [
-            Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFF0F766E), Color(0xFF14B8A6)],
-                ),
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF14B8A6).withAlpha(60),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.asset(
+                'assets/brand/app_icon_golden_roost.jpg',
+                width: 38,
+                height: 38,
+                fit: BoxFit.cover,
+                errorBuilder: (ctx, err, stack) => Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [AppColors.forestEmerald, AppColors.deepForest],
+                    ),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                ],
-              ),
-              child: const Icon(
-                Icons.egg_alt_rounded,
-                color: Colors.white,
-                size: 20,
+                  child: const Icon(
+                    Icons.egg_alt_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 10),
@@ -135,9 +137,7 @@ class DashboardScreen extends ConsumerWidget {
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(
-                          context.tr('dash_no_tasks_today'),
-                        ),
+                        content: Text(context.tr('dash_no_tasks_today')),
                         duration: const Duration(seconds: 2),
                       ),
                     );
@@ -293,7 +293,12 @@ class DashboardScreen extends ConsumerWidget {
               // 2. Executive Operations Bento Grid (Stripe / Apple style)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: _buildOperationsBentoGrid(context, stats, settings, isDark),
+                child: _buildOperationsBentoGrid(
+                  context,
+                  stats,
+                  settings,
+                  isDark,
+                ),
               ),
 
               const SizedBox(height: 16),
@@ -410,8 +415,12 @@ class DashboardScreen extends ConsumerWidget {
                                       Container(
                                         padding: const EdgeInsets.all(6),
                                         decoration: BoxDecoration(
-                                          color: AppColors.warning.withAlpha(20),
-                                          borderRadius: BorderRadius.circular(6),
+                                          color: AppColors.warning.withAlpha(
+                                            20,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
                                         ),
                                         child: const Icon(
                                           Icons.wb_incandescent_outlined,
@@ -582,7 +591,9 @@ class DashboardScreen extends ConsumerWidget {
                                     .read(tasksProvider.notifier)
                                     .toggleComplete(task);
                                 if (res != null && context.mounted) {
-                                  ref.read(feedInventoryProvider.notifier).loadInventory();
+                                  ref
+                                      .read(feedInventoryProvider.notifier)
+                                      .loadInventory();
                                   ref.invalidate(feedTransactionsProvider);
                                   ref.invalidate(dashboardStatsProvider);
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -591,12 +602,19 @@ class DashboardScreen extends ConsumerWidget {
                                       behavior: SnackBarBehavior.floating,
                                       content: Row(
                                         children: [
-                                          const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+                                          const Icon(
+                                            Icons.check_circle_rounded,
+                                            color: Colors.white,
+                                            size: 20,
+                                          ),
                                           const SizedBox(width: 8),
                                           Expanded(
                                             child: Text(
                                               '${context.tr('feed_task_completed_deducted')}: ${res.deductedKg.toStringAsFixed(1)} kg (${res.feedName})',
-                                              style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.white,
+                                              ),
                                             ),
                                           ),
                                         ],
@@ -737,6 +755,7 @@ class DashboardScreen extends ConsumerWidget {
       onCollectEggs: () => EggLogFormDialog.show(context),
       onRecordMortality: () =>
           BirdMovementDialog.show(context, initialType: 'mortality'),
+      onRecordSale: () => BirdMovementDialog.show(context, initialType: 'sale'),
       onAddExpense: () =>
           FinanceFormDialog.show(context, initialType: 'expense'),
       onAddIncome: () => FinanceFormDialog.show(context, initialType: 'income'),
@@ -772,7 +791,9 @@ class DashboardScreen extends ConsumerWidget {
     FarmSettings settings,
     bool isDark,
   ) {
-    final cardBorder = isDark ? const Color(0xFF1E283D) : const Color(0xFFE2E8F0);
+    final cardBorder = isDark
+        ? const Color(0xFF1E283D)
+        : const Color(0xFFE2E8F0);
     final cardBg = isDark ? const Color(0xFF0F1626) : Colors.white;
 
     return Column(
@@ -825,10 +846,7 @@ class DashboardScreen extends ConsumerWidget {
                               ],
                             ),
                             child: const Center(
-                              child: ChickenIcon(
-                                color: Colors.white,
-                                size: 21,
-                              ),
+                              child: ChickenIcon(color: Colors.white, size: 21),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -866,9 +884,14 @@ class DashboardScreen extends ConsumerWidget {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4.5,
+                      ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF10B981).withAlpha(isDark ? 40 : 25),
+                        color: const Color(
+                          0xFF10B981,
+                        ).withAlpha(isDark ? 40 : 25),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
                           color: const Color(0xFF10B981).withAlpha(90),
@@ -921,7 +944,9 @@ class DashboardScreen extends ConsumerWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                        color: isDark
+                            ? const Color(0xFF94A3B8)
+                            : const Color(0xFF64748B),
                       ),
                     ),
                     const Spacer(),
@@ -929,16 +954,23 @@ class DashboardScreen extends ConsumerWidget {
                       Directionality.of(context) == TextDirection.rtl
                           ? Icons.chevron_left_rounded
                           : Icons.chevron_right_rounded,
-                      color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                      color: isDark
+                          ? const Color(0xFF64748B)
+                          : const Color(0xFF94A3B8),
                       size: 20,
                     ),
                   ],
                 ),
                 const SizedBox(height: 14),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF172033) : const Color(0xFFF1F5F9),
+                    color: isDark
+                        ? const Color(0xFF172033)
+                        : const Color(0xFFF1F5F9),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
@@ -957,7 +989,9 @@ class DashboardScreen extends ConsumerWidget {
                             style: TextStyle(
                               fontSize: 11.5,
                               fontWeight: FontWeight.w600,
-                              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                              color: isDark
+                                  ? AppColors.textSecondaryDark
+                                  : AppColors.textSecondaryLight,
                             ),
                           ),
                         ],
@@ -969,7 +1003,9 @@ class DashboardScreen extends ConsumerWidget {
                           fontWeight: FontWeight.w600,
                           color: stats.pendingVaccinationsCount > 0
                               ? AppColors.warning
-                              : (isDark ? AppColors.textTertiaryDark : AppColors.textTertiaryLight),
+                              : (isDark
+                                    ? AppColors.textTertiaryDark
+                                    : AppColors.textTertiaryLight),
                         ),
                       ),
                     ],
@@ -1017,9 +1053,14 @@ class DashboardScreen extends ConsumerWidget {
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 7,
+                              vertical: 2.5,
+                            ),
                             decoration: BoxDecoration(
-                              color: AppColors.warning.withAlpha(isDark ? 40 : 25),
+                              color: AppColors.warning.withAlpha(
+                                isDark ? 40 : 25,
+                              ),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
@@ -1040,7 +1081,9 @@ class DashboardScreen extends ConsumerWidget {
                           fontSize: 28,
                           fontWeight: FontWeight.w900,
                           letterSpacing: -0.8,
-                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF0F172A),
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -1049,7 +1092,9 @@ class DashboardScreen extends ConsumerWidget {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                          color: isDark
+                              ? AppColors.textSecondaryDark
+                              : AppColors.textSecondaryLight,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -1058,10 +1103,17 @@ class DashboardScreen extends ConsumerWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(3),
                         child: LinearProgressIndicator(
-                          value: (stats.eggsCollectedToday / 400.0).clamp(0.05, 1.0),
+                          value: (stats.eggsCollectedToday / 400.0).clamp(
+                            0.05,
+                            1.0,
+                          ),
                           minHeight: 4,
-                          backgroundColor: isDark ? const Color(0xFF1E283D) : const Color(0xFFE2E8F0),
-                          valueColor: const AlwaysStoppedAnimation<Color>(AppColors.warning),
+                          backgroundColor: isDark
+                              ? const Color(0xFF1E283D)
+                              : const Color(0xFFE2E8F0),
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            AppColors.warning,
+                          ),
                         ),
                       ),
                     ],
@@ -1105,9 +1157,14 @@ class DashboardScreen extends ConsumerWidget {
                           ),
                           Flexible(
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 7,
+                                vertical: 2.5,
+                              ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF10B981).withAlpha(isDark ? 40 : 25),
+                                color: const Color(
+                                  0xFF10B981,
+                                ).withAlpha(isDark ? 40 : 25),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
@@ -1128,12 +1185,17 @@ class DashboardScreen extends ConsumerWidget {
                       Text(
                         stats.feedDaysRemaining > 0
                             ? '~${stats.feedDaysRemaining}d'
-                            : (stats.totalLiveBirds == 0 || stats.totalFeedStockKg == 0 ? '--' : '0d'),
+                            : (stats.totalLiveBirds == 0 ||
+                                      stats.totalFeedStockKg == 0
+                                  ? '--'
+                                  : '0d'),
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w900,
                           letterSpacing: -0.8,
-                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF0F172A),
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -1144,7 +1206,9 @@ class DashboardScreen extends ConsumerWidget {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                          color: isDark
+                              ? AppColors.textSecondaryDark
+                              : AppColors.textSecondaryLight,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -1153,10 +1217,17 @@ class DashboardScreen extends ConsumerWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(3),
                         child: LinearProgressIndicator(
-                          value: (stats.feedDaysRemaining / 60.0).clamp(0.05, 1.0),
+                          value: (stats.feedDaysRemaining / 60.0).clamp(
+                            0.05,
+                            1.0,
+                          ),
                           minHeight: 4,
-                          backgroundColor: isDark ? const Color(0xFF1E283D) : const Color(0xFFE2E8F0),
-                          valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF10B981)),
+                          backgroundColor: isDark
+                              ? const Color(0xFF1E283D)
+                              : const Color(0xFFE2E8F0),
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            Color(0xFF10B981),
+                          ),
                         ),
                       ),
                     ],
@@ -1188,7 +1259,9 @@ class DashboardScreen extends ConsumerWidget {
                     ),
               borderRadius: BorderRadius.circular(18),
               border: Border.all(
-                color: isDark ? const Color(0xFF1E283D) : const Color(0xFF334155),
+                color: isDark
+                    ? const Color(0xFF1E283D)
+                    : const Color(0xFF334155),
                 width: 1,
               ),
               boxShadow: [
@@ -1232,7 +1305,10 @@ class DashboardScreen extends ConsumerWidget {
                       ],
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withAlpha(18),
                         borderRadius: BorderRadius.circular(6),
@@ -1281,7 +1357,10 @@ class DashboardScreen extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 7,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFF10B981).withAlpha(30),
                           borderRadius: BorderRadius.circular(8),
@@ -1317,7 +1396,10 @@ class DashboardScreen extends ConsumerWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 7,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFFE11D48).withAlpha(25),
                           borderRadius: BorderRadius.circular(8),
@@ -1339,7 +1421,10 @@ class DashboardScreen extends ConsumerWidget {
                             ),
                             const Spacer(),
                             Text(
-                              AppFormatters.formatCurrency(stats.todayExpenses, settings.currency),
+                              AppFormatters.formatCurrency(
+                                stats.todayExpenses,
+                                settings.currency,
+                              ),
                               style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,

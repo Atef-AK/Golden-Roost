@@ -84,7 +84,10 @@ class AppIcons {
       case 'water':
         return (water, const Color(0xFF06B6D4));
       case 'equipment':
-        return (Icons.precision_manufacturing_outlined, const Color(0xFF64748B));
+        return (
+          Icons.precision_manufacturing_outlined,
+          const Color(0xFF64748B),
+        );
       case 'coop':
       case 'housing':
         return (coop, const Color(0xFF8B5CF6));

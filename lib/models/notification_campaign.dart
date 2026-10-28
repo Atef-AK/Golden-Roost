@@ -9,7 +9,8 @@ class NotificationCampaign {
   final String campaignType; // 'article', 'product', 'announcement', 'reminder'
   final String destinationType; // 'article', 'product', 'dashboard', 'url'
   final String? destinationId;
-  final String audienceFilter; // 'all', 'arabic', 'french', 'english', 'opted_in_marketing'
+  final String
+  audienceFilter; // 'all', 'arabic', 'french', 'english', 'opted_in_marketing'
   final String status; // 'draft', 'scheduled', 'sent', 'failed'
   final int sentCount;
   final DateTime? scheduledAt;

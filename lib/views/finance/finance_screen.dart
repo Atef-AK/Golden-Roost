@@ -192,7 +192,9 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
                                     if (capitalInvestments > 0)
                                       Expanded(
                                         child: _PnlMetric(
-                                          label: context.tr('finance_capital_assets'),
+                                          label: context.tr(
+                                            'finance_capital_assets',
+                                          ),
                                           amount: AppFormatters.formatCurrency(
                                             capitalInvestments,
                                             currency,
@@ -206,7 +208,9 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
                                     if (unpaid > 0)
                                       Expanded(
                                         child: _PnlMetric(
-                                          label: context.tr('finance_unpaid_receivables'),
+                                          label: context.tr(
+                                            'finance_unpaid_receivables',
+                                          ),
                                           amount: AppFormatters.formatCurrency(
                                             unpaid,
                                             currency,
@@ -266,7 +270,9 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
                               const SizedBox(width: 12),
                               Expanded(
                                 child: _PnlMetric(
-                                  label: context.tr('finance_unpaid_receivables'),
+                                  label: context.tr(
+                                    'finance_unpaid_receivables',
+                                  ),
                                   amount: AppFormatters.formatCurrency(
                                     unpaid,
                                     currency,
@@ -356,9 +362,15 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
                   const SizedBox(width: 8),
                   _buildFilterChip('income', context.tr('finance_revenues')),
                   const SizedBox(width: 8),
-                  _buildFilterChip('expense', context.tr('finance_operating_costs')),
+                  _buildFilterChip(
+                    'expense',
+                    context.tr('finance_operating_costs'),
+                  ),
                   const SizedBox(width: 8),
-                  _buildFilterChip('capital', context.tr('finance_capital_filter')),
+                  _buildFilterChip(
+                    'capital',
+                    context.tr('finance_capital_filter'),
+                  ),
                 ],
               ),
             ),
@@ -381,7 +393,8 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
                 child: Column(
                   children: filteredList.map((tx) {
                     final isIncome = tx.isIncome;
-                    final (catIcon, catColor) = AppIcons.getFinanceCategoryVisual(tx.category);
+                    final (catIcon, catColor) =
+                        AppIcons.getFinanceCategoryVisual(tx.category);
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8),
@@ -418,8 +431,8 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
                                       color: isIncome
                                           ? AppColors.semanticSuccess
                                           : (tx.isCapitalInvestment
-                                              ? AppColors.primaryTeal
-                                              : AppColors.semanticError),
+                                                ? AppColors.primaryTeal
+                                                : AppColors.semanticError),
                                       shape: BoxShape.circle,
                                     ),
                                     child: Icon(
@@ -442,7 +455,9 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
                                     children: [
                                       Expanded(
                                         child: Text(
-                                          context.trFinanceCategory(tx.category),
+                                          context.trFinanceCategory(
+                                            tx.category,
+                                          ),
                                           style: const TextStyle(
                                             fontWeight: FontWeight.w700,
                                             fontSize: 13,
@@ -498,7 +513,9 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
                                       const SizedBox(width: 4),
                                       if (tx.isCapitalInvestment)
                                         StatusBadge(
-                                          label: context.tr('finance_capital_badge'),
+                                          label: context.tr(
+                                            'finance_capital_badge',
+                                          ),
                                           variant: BadgeVariant.primary,
                                         )
                                       else if (tx.paymentStatus != 'paid')

@@ -64,9 +64,7 @@ class _FlockDetailScreenState extends ConsumerState<FlockDetailScreen>
     if (flock == null) {
       return Scaffold(
         appBar: AppBar(title: Text(context.tr('flocks_title'))),
-        body: Center(
-          child: Text(context.tr('flocks_empty')),
-        ),
+        body: Center(child: Text(context.tr('flocks_empty'))),
       );
     }
 
@@ -75,12 +73,10 @@ class _FlockDetailScreenState extends ConsumerState<FlockDetailScreen>
         .watch(eggLogsProvider)
         .where((e) => e.flockId == flock.id)
         .toList();
-    final feedLogs = (ref
-            .watch(feedTransactionsProvider(flock.id))
-            .valueOrNull ??
-        [])
-        .where((t) => t.flockId == flock.id)
-        .toList();
+    final feedLogs =
+        (ref.watch(feedTransactionsProvider(flock.id)).valueOrNull ?? [])
+            .where((t) => t.flockId == flock.id)
+            .toList();
     final vaxs = ref
         .watch(vaccinationsProvider)
         .where((v) => v.flockId == flock.id)
@@ -306,7 +302,10 @@ class _FlockDetailScreenState extends ConsumerState<FlockDetailScreen>
               const SizedBox(height: 8),
               Text(
                 '${context.tr('flocks_species')}: ${context.trSpecies(flock.species)} • ${context.tr('flocks_breed')}: ${flock.breed.isNotEmpty ? flock.breed : context.tr('flocks_standard_breed')}',
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
               ),
               const SizedBox(height: 2),
               Text(
@@ -323,7 +322,10 @@ class _FlockDetailScreenState extends ConsumerState<FlockDetailScreen>
                 onTap: () => _editFlockBirthDate(context, flock),
                 borderRadius: BorderRadius.circular(10),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primaryTeal.withAlpha(isDark ? 35 : 15),
                     borderRadius: BorderRadius.circular(10),
@@ -334,7 +336,11 @@ class _FlockDetailScreenState extends ConsumerState<FlockDetailScreen>
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.cake_outlined, size: 16, color: AppColors.primaryTeal),
+                      const Icon(
+                        Icons.cake_outlined,
+                        size: 16,
+                        color: AppColors.primaryTeal,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -349,7 +355,11 @@ class _FlockDetailScreenState extends ConsumerState<FlockDetailScreen>
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Icon(Icons.edit_calendar_rounded, size: 16, color: AppColors.primaryTeal),
+                      const Icon(
+                        Icons.edit_calendar_rounded,
+                        size: 16,
+                        color: AppColors.primaryTeal,
+                      ),
                     ],
                   ),
                 ),
@@ -1108,7 +1118,10 @@ class _FlockDetailScreenState extends ConsumerState<FlockDetailScreen>
             behavior: SnackBarBehavior.floating,
             content: Text(
               '${context.tr('flocks_age_preview')}: ${updated.ageInWeeks} ${context.tr('flocks_weeks')} (${updated.ageInDays} ${context.tr('flocks_days')})',
-              style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
             ),
           ),
         );
@@ -1167,7 +1180,8 @@ class _MetricMini extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.w800,
                   fontSize: 16,
-                  color: color ??
+                  color:
+                      color ??
                       (isDark
                           ? AppColors.textPrimaryDark
                           : AppColors.textPrimaryLight),
@@ -1183,7 +1197,9 @@ class _MetricMini extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                color: isDark
+                    ? AppColors.textMutedDark
+                    : AppColors.textMutedLight,
               ),
             ),
           ],

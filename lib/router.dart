@@ -18,6 +18,7 @@ import 'views/tasks/tasks_calendar_screen.dart';
 import 'views/reports/reports_screen.dart';
 import 'views/settings/settings_screen.dart';
 import 'views/splash/splash_screen.dart';
+import 'views/onboarding/onboarding_screen.dart';
 import 'views/articles/articles_list_screen.dart';
 import 'views/products/products_catalogue_screen.dart';
 import 'views/admin/admin_dashboard_screen.dart';
@@ -34,6 +35,11 @@ final appRouter = GoRouter(
       path: '/splash',
       parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) => const SplashScreen(),
+    ),
+    GoRoute(
+      path: '/onboarding',
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) => const OnboardingScreen(),
     ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {

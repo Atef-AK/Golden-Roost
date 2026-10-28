@@ -6,19 +6,18 @@ import '../utils/formatters.dart';
 /// Custom MaterialLocalizations for Arabic that guarantees standard Western numerals (0, 1, 2, ..., 9)
 /// across the calendar, date pickers, year pickers, and number displays instead of Eastern Arabic/Indic glyphs (٠-٩).
 class WesternArabicMaterialLocalizations extends MaterialLocalizationAr {
-  WesternArabicMaterialLocalizations({
-    super.localeName = 'ar',
-  }) : super(
-          fullYearFormat: intl.DateFormat('y', 'en'),
-          compactDateFormat: intl.DateFormat('yMd', 'ar'),
-          shortDateFormat: intl.DateFormat('yMMMd', 'ar'),
-          mediumDateFormat: intl.DateFormat('EEE, yMMMd', 'ar'),
-          longDateFormat: intl.DateFormat('EEEE, yMMMMd', 'ar'),
-          yearMonthFormat: intl.DateFormat('MMMM y', 'ar'),
-          shortMonthDayFormat: intl.DateFormat('MMMd', 'ar'),
-          decimalFormat: intl.NumberFormat.decimalPattern('en'),
-          twoDigitZeroPaddedFormat: intl.NumberFormat('00', 'en'),
-        );
+  WesternArabicMaterialLocalizations({super.localeName = 'ar'})
+    : super(
+        fullYearFormat: intl.DateFormat('y', 'en'),
+        compactDateFormat: intl.DateFormat('yMd', 'ar'),
+        shortDateFormat: intl.DateFormat('yMMMd', 'ar'),
+        mediumDateFormat: intl.DateFormat('EEE, yMMMd', 'ar'),
+        longDateFormat: intl.DateFormat('EEEE, yMMMMd', 'ar'),
+        yearMonthFormat: intl.DateFormat('MMMM y', 'ar'),
+        shortMonthDayFormat: intl.DateFormat('MMMd', 'ar'),
+        decimalFormat: intl.NumberFormat.decimalPattern('en'),
+        twoDigitZeroPaddedFormat: intl.NumberFormat('00', 'en'),
+      );
 
   @override
   String formatDecimal(int number) => number.toString();

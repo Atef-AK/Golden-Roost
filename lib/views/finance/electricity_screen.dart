@@ -142,7 +142,10 @@ class _ElectricityScreenState extends ConsumerState<ElectricityScreen> {
                       onPressed: () => _editTariffDialog(context, tariff),
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
-                        child: Text(context.tr('electricity_change_tariff'), maxLines: 1),
+                        child: Text(
+                          context.tr('electricity_change_tariff'),
+                          maxLines: 1,
+                        ),
                       ),
                     ),
                   ],
@@ -189,7 +192,9 @@ class _ElectricityScreenState extends ConsumerState<ElectricityScreen> {
                                 controller: _calcWattageController,
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
-                                  labelText: context.tr('electricity_calc_power'),
+                                  labelText: context.tr(
+                                    'electricity_calc_power',
+                                  ),
                                   suffixText: 'W',
                                 ),
                                 onChanged: (_) => setState(() {}),
@@ -202,7 +207,9 @@ class _ElectricityScreenState extends ConsumerState<ElectricityScreen> {
                                       controller: _calcHoursController,
                                       keyboardType: TextInputType.number,
                                       decoration: InputDecoration(
-                                        labelText: context.tr('electricity_calc_hours'),
+                                        labelText: context.tr(
+                                          'electricity_calc_hours',
+                                        ),
                                         suffixText: 'h',
                                       ),
                                       onChanged: (_) => setState(() {}),
@@ -214,7 +221,9 @@ class _ElectricityScreenState extends ConsumerState<ElectricityScreen> {
                                       controller: _calcDaysController,
                                       keyboardType: TextInputType.number,
                                       decoration: InputDecoration(
-                                        labelText: context.tr('electricity_calc_days'),
+                                        labelText: context.tr(
+                                          'electricity_calc_days',
+                                        ),
                                         suffixText: 'd',
                                       ),
                                       onChanged: (_) => setState(() {}),
@@ -232,7 +241,9 @@ class _ElectricityScreenState extends ConsumerState<ElectricityScreen> {
                                 controller: _calcWattageController,
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
-                                  labelText: context.tr('electricity_calc_power'),
+                                  labelText: context.tr(
+                                    'electricity_calc_power',
+                                  ),
                                   suffixText: 'W',
                                 ),
                                 onChanged: (_) => setState(() {}),
@@ -244,7 +255,9 @@ class _ElectricityScreenState extends ConsumerState<ElectricityScreen> {
                                 controller: _calcHoursController,
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
-                                  labelText: context.tr('electricity_calc_hours'),
+                                  labelText: context.tr(
+                                    'electricity_calc_hours',
+                                  ),
                                   suffixText: 'h',
                                 ),
                                 onChanged: (_) => setState(() {}),
@@ -256,7 +269,9 @@ class _ElectricityScreenState extends ConsumerState<ElectricityScreen> {
                                 controller: _calcDaysController,
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
-                                  labelText: context.tr('electricity_calc_days'),
+                                  labelText: context.tr(
+                                    'electricity_calc_days',
+                                  ),
                                   suffixText: 'd',
                                 ),
                                 onChanged: (_) => setState(() {}),
@@ -586,7 +601,9 @@ class _ElectricityScreenState extends ConsumerState<ElectricityScreen> {
                     decimal: true,
                   ),
                   decoration: InputDecoration(
-                    labelText: context.tr('finance_electricity_current_reading'),
+                    labelText: context.tr(
+                      'finance_electricity_current_reading',
+                    ),
                     suffixText: 'kWh',
                   ),
                 ),
@@ -597,7 +614,9 @@ class _ElectricityScreenState extends ConsumerState<ElectricityScreen> {
                     decimal: true,
                   ),
                   decoration: InputDecoration(
-                    labelText: context.tr('finance_electricity_consumed_period'),
+                    labelText: context.tr(
+                      'finance_electricity_consumed_period',
+                    ),
                     suffixText: 'kWh',
                   ),
                   onChanged: (val) {
@@ -622,7 +641,8 @@ class _ElectricityScreenState extends ConsumerState<ElectricityScreen> {
                 TextField(
                   controller: notesCtrl,
                   decoration: InputDecoration(
-                    labelText: '${context.tr('notes')} (e.g. Monthly coop bill)',
+                    labelText:
+                        '${context.tr('notes')} (e.g. Monthly coop bill)',
                   ),
                 ),
               ],

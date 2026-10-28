@@ -248,16 +248,18 @@ class _BatchCard extends StatelessWidget {
                       width: 34,
                       height: 34,
                       decoration: BoxDecoration(
-                        color: (batch.status == 'hatched'
-                                ? Colors.amber
-                                : AppColors.warning)
-                            .withAlpha(24),
+                        color:
+                            (batch.status == 'hatched'
+                                    ? Colors.amber
+                                    : AppColors.warning)
+                                .withAlpha(24),
                         borderRadius: BorderRadius.circular(9),
                         border: Border.all(
-                          color: (batch.status == 'hatched'
-                                  ? Colors.amber
-                                  : AppColors.warning)
-                              .withAlpha(50),
+                          color:
+                              (batch.status == 'hatched'
+                                      ? Colors.amber
+                                      : AppColors.warning)
+                                  .withAlpha(50),
                           width: 1,
                         ),
                       ),

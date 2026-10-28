@@ -167,7 +167,10 @@ class _FeedInventoryScreenState extends ConsumerState<FeedInventoryScreen>
                           icon: const Icon(Icons.restaurant, size: 16),
                           label: FittedBox(
                             fit: BoxFit.scaleDown,
-                            child: Text(context.tr('feed_log_btn'), maxLines: 1),
+                            child: Text(
+                              context.tr('feed_log_btn'),
+                              maxLines: 1,
+                            ),
                           ),
                           onPressed: () => FeedLogDialog.show(context),
                         ),
@@ -189,11 +192,11 @@ class _FeedInventoryScreenState extends ConsumerState<FeedInventoryScreen>
                       border: Border.all(
                         color:
                             (dashStats.feedDaysRemaining <= 3 &&
-                                    dashStats.totalFeedStockKg > 0)
-                                ? AppColors.error.withAlpha(70)
-                                : (isDark
-                                    ? AppColors.borderDark
-                                    : AppColors.borderLight),
+                                dashStats.totalFeedStockKg > 0)
+                            ? AppColors.error.withAlpha(70)
+                            : (isDark
+                                  ? AppColors.borderDark
+                                  : AppColors.borderLight),
                       ),
                     ),
                     child: Column(
@@ -297,9 +300,9 @@ class _FeedInventoryScreenState extends ConsumerState<FeedInventoryScreen>
                                   const SizedBox(height: 2),
                                   Text(
                                     dashStats.estimatedRefillDate != null
-                                        ? DateFormat(
-                                            'dd/MM/yyyy',
-                                          ).format(dashStats.estimatedRefillDate!)
+                                        ? DateFormat('dd/MM/yyyy').format(
+                                            dashStats.estimatedRefillDate!,
+                                          )
                                         : '--',
                                     style: const TextStyle(
                                       fontSize: 14,
@@ -372,11 +375,11 @@ class _FeedInventoryScreenState extends ConsumerState<FeedInventoryScreen>
                             physics: const NeverScrollableScrollPhysics(),
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 12,
-                              mainAxisSpacing: 12,
-                              mainAxisExtent: 185,
-                            ),
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 12,
+                                  mainAxisSpacing: 12,
+                                  mainAxisExtent: 185,
+                                ),
                             itemCount: feeds.length,
                             itemBuilder: (ctx, i) =>
                                 _buildFeedCard(feeds[i], currency, isDark),
@@ -451,10 +454,11 @@ class _FeedInventoryScreenState extends ConsumerState<FeedInventoryScreen>
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: (isPurchase
-                                ? AppColors.semanticSuccess
-                                : AppColors.primaryTeal)
-                            .withAlpha(20),
+                        color:
+                            (isPurchase
+                                    ? AppColors.semanticSuccess
+                                    : AppColors.primaryTeal)
+                                .withAlpha(20),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(
@@ -490,7 +494,9 @@ class _FeedInventoryScreenState extends ConsumerState<FeedInventoryScreen>
                               const SizedBox(width: 6),
                               StatusBadge(
                                 label: isPurchase
-                                    ? context.tr('feed_restock_btn').toUpperCase()
+                                    ? context
+                                          .tr('feed_restock_btn')
+                                          .toUpperCase()
                                     : context.tr('feed_log_btn').toUpperCase(),
                                 variant: isPurchase
                                     ? BadgeVariant.success
@@ -626,7 +632,9 @@ class _FeedInventoryScreenState extends ConsumerState<FeedInventoryScreen>
               ),
               const SizedBox(width: 6),
               StatusBadge(
-                label: isLow ? context.tr('feed_low_stock') : context.tr('feed_in_stock'),
+                label: isLow
+                    ? context.tr('feed_low_stock')
+                    : context.tr('feed_in_stock'),
                 variant: isLow ? BadgeVariant.warning : BadgeVariant.success,
               ),
               PopupMenuButton<String>(
@@ -930,14 +938,18 @@ class _FeedInventoryScreenState extends ConsumerState<FeedInventoryScreen>
 
   void _editFeedTypeDialog(BuildContext context, FeedItem feed) {
     final nameCtrl = TextEditingController(text: feed.name);
-    final bagWeightCtrl =
-        TextEditingController(text: feed.bagWeightKg.toString());
-    final bagPriceCtrl =
-        TextEditingController(text: feed.costPerBag.toString());
-    final stockCtrl =
-        TextEditingController(text: feed.currentStockKg.toString());
-    final lowStockThresholdCtrl =
-        TextEditingController(text: feed.lowStockThresholdKg.toString());
+    final bagWeightCtrl = TextEditingController(
+      text: feed.bagWeightKg.toString(),
+    );
+    final bagPriceCtrl = TextEditingController(
+      text: feed.costPerBag.toString(),
+    );
+    final stockCtrl = TextEditingController(
+      text: feed.currentStockKg.toString(),
+    );
+    final lowStockThresholdCtrl = TextEditingController(
+      text: feed.lowStockThresholdKg.toString(),
+    );
     final currency = ref.read(settingsProvider).currency;
     String feedType = feed.feedType;
 
@@ -1070,7 +1082,7 @@ class _FeedInventoryScreenState extends ConsumerState<FeedInventoryScreen>
                     double.tryParse(stockCtrl.text) ?? feed.currentStockKg;
                 final lowThresh =
                     double.tryParse(lowStockThresholdCtrl.text) ??
-                        feed.lowStockThresholdKg;
+                    feed.lowStockThresholdKg;
 
                 final updated = feed.copyWith(
                   name: name,
@@ -1082,7 +1094,9 @@ class _FeedInventoryScreenState extends ConsumerState<FeedInventoryScreen>
                   updatedAt: DateTime.now(),
                 );
 
-                ref.read(feedInventoryProvider.notifier).updateFeedItem(updated);
+                ref
+                    .read(feedInventoryProvider.notifier)
+                    .updateFeedItem(updated);
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(context.tr('feed_type_updated'))),
@@ -1115,7 +1129,9 @@ class _FeedInventoryScreenState extends ConsumerState<FeedInventoryScreen>
               ref.read(feedInventoryProvider.notifier).deleteFeedItem(feed.id);
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${context.tr('delete')}: ${feed.name}')),
+                SnackBar(
+                  content: Text('${context.tr('delete')}: ${feed.name}'),
+                ),
               );
             },
             child: Text(context.tr('delete')),
@@ -1173,9 +1189,7 @@ class _FeedInventoryScreenState extends ConsumerState<FeedInventoryScreen>
               const SizedBox(height: 12),
               TextField(
                 controller: notesCtrl,
-                decoration: InputDecoration(
-                  labelText: context.tr('notes'),
-                ),
+                decoration: InputDecoration(labelText: context.tr('notes')),
               ),
             ],
           ),
@@ -1206,17 +1220,13 @@ class _FeedInventoryScreenState extends ConsumerState<FeedInventoryScreen>
                 createdAt: tx.createdAt,
               );
 
-              ref.read(feedInventoryProvider.notifier).updateTransaction(
-                    updated,
-                    tx.quantityKg,
-                    tx.cost,
-                  );
+              ref
+                  .read(feedInventoryProvider.notifier)
+                  .updateTransaction(updated, tx.quantityKg, tx.cost);
               ref.invalidate(feedTransactionsProvider);
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(context.tr('feed_tx_updated')),
-                ),
+                SnackBar(content: Text(context.tr('feed_tx_updated'))),
               );
             },
             child: Text(context.tr('save')),
@@ -1230,7 +1240,9 @@ class _FeedInventoryScreenState extends ConsumerState<FeedInventoryScreen>
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('${context.tr('delete')} ${context.tr('finance_transaction')}'),
+        title: Text(
+          '${context.tr('delete')} ${context.tr('finance_transaction')}',
+        ),
         content: Text(context.tr('feed_delete_tx_confirm')),
         actions: [
           TextButton(
@@ -1242,15 +1254,11 @@ class _FeedInventoryScreenState extends ConsumerState<FeedInventoryScreen>
               backgroundColor: AppColors.semanticError,
             ),
             onPressed: () {
-              ref
-                  .read(feedInventoryProvider.notifier)
-                  .deleteTransaction(tx.id);
+              ref.read(feedInventoryProvider.notifier).deleteTransaction(tx.id);
               ref.invalidate(feedTransactionsProvider);
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(context.tr('feed_tx_deleted')),
-                ),
+                SnackBar(content: Text(context.tr('feed_tx_deleted'))),
               );
             },
             child: Text(context.tr('delete')),
@@ -1279,7 +1287,8 @@ class _FeedInventoryScreenState extends ConsumerState<FeedInventoryScreen>
                   controller: bagsCtrl,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: '${context.tr('feed_num_bags')} (${feed.bagWeightKg} kg)',
+                    labelText:
+                        '${context.tr('feed_num_bags')} (${feed.bagWeightKg} kg)',
                     suffixIcon: const Icon(Icons.shopping_bag),
                   ),
                   onChanged: (val) {
@@ -1298,7 +1307,8 @@ class _FeedInventoryScreenState extends ConsumerState<FeedInventoryScreen>
                     decimal: true,
                   ),
                   decoration: InputDecoration(
-                    labelText: '${context.tr('finance_total_cost')} ($currency)',
+                    labelText:
+                        '${context.tr('finance_total_cost')} ($currency)',
                     suffixText: currency,
                   ),
                 ),
@@ -1345,9 +1355,7 @@ class _FeedInventoryScreenState extends ConsumerState<FeedInventoryScreen>
                 ref.invalidate(feedTransactionsProvider);
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(context.tr('feed_restock_confirm')),
-                  ),
+                  SnackBar(content: Text(context.tr('feed_restock_confirm'))),
                 );
               },
               child: Text(context.tr('feed_restock_confirm')),

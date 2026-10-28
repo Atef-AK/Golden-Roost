@@ -26,10 +26,7 @@ class ChickenIcon extends StatelessWidget {
       height: size,
       child: CustomPaint(
         size: Size(size, size),
-        painter: _ChickenPainter(
-          color: effectiveColor,
-          outlined: outlined,
-        ),
+        painter: _ChickenPainter(color: effectiveColor, outlined: outlined),
       ),
     );
   }
@@ -102,7 +99,14 @@ class _ChickenPainter extends CustomPainter {
     // Sleek aerodynamic wing accent
     final wingPath = Path();
     wingPath.moveTo(w * 0.40, h * 0.52);
-    wingPath.cubicTo(w * 0.48, h * 0.67, w * 0.62, h * 0.69, w * 0.72, h * 0.58);
+    wingPath.cubicTo(
+      w * 0.48,
+      h * 0.67,
+      w * 0.62,
+      h * 0.69,
+      w * 0.72,
+      h * 0.58,
+    );
 
     final wingPaint = Paint()
       ..color = outlined ? color : Colors.white.withAlpha(220)

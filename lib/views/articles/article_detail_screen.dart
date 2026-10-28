@@ -44,6 +44,7 @@ class _ArticleDetailScreenState extends ConsumerState<ArticleDetailScreen> {
               PopupMenuItem(value: 'en', child: Text('English')),
               PopupMenuItem(value: 'fr', child: Text('Français')),
               PopupMenuItem(value: 'ar', child: Text('العربية')),
+              PopupMenuItem(value: 'es', child: Text('Español')),
             ],
           ),
         ],
@@ -225,10 +226,7 @@ class _ArticleDetailScreenState extends ConsumerState<ArticleDetailScreen> {
                       : const Color(0xFFF8FAFC),
                   borderRadius: BorderRadius.circular(8),
                   border: Border(
-                    left: BorderSide(
-                      color: AppColors.primaryTeal,
-                      width: 3,
-                    ),
+                    left: BorderSide(color: AppColors.primaryTeal, width: 3),
                   ),
                 ),
                 child: Text(

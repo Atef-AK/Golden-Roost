@@ -32,10 +32,7 @@ class ProductsCatalogueScreen extends ConsumerWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.tr('products_title')),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: Text(context.tr('products_title')), elevation: 0),
       body: ResponsiveContainer(
         maxWidth: 1000,
         child: Column(
@@ -110,9 +107,8 @@ class ProductsCatalogueScreen extends ConsumerWidget {
                         ? const Color(0xFF1E293B)
                         : const Color(0xFFF1F5F9),
                     onSelected: (selected) {
-                      ref
-                          .read(productCategoryFilterProvider.notifier)
-                          .state = selected ? cat['id'] : null;
+                      ref.read(productCategoryFilterProvider.notifier).state =
+                          selected ? cat['id'] : null;
                     },
                   );
                 },
@@ -200,7 +196,10 @@ class _ProductCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 7,
+                  vertical: 2.5,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.primaryTeal.withAlpha(25),
                   borderRadius: BorderRadius.circular(6),
@@ -269,7 +268,10 @@ class _ProductCard extends StatelessWidget {
             children: [
               Text(
                 product.price > 0
-                    ? AppFormatters.formatCurrency(product.price, product.currency)
+                    ? AppFormatters.formatCurrency(
+                        product.price,
+                        product.currency,
+                      )
                     : 'Check Merchant',
                 style: const TextStyle(
                   fontSize: 14,
@@ -280,8 +282,10 @@ class _ProductCard extends StatelessWidget {
               FilledButton.icon(
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.primaryTeal,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   visualDensity: VisualDensity.compact,
                 ),
                 icon: const Icon(Icons.open_in_new, size: 13),

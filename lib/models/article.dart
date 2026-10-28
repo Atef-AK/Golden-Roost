@@ -10,7 +10,8 @@ class Article {
   final String bodyEn;
   final String bodyFr;
   final String bodyAr;
-  final String category; // 'health', 'brooding', 'biosecurity', 'egg_production', 'quail', 'nutrition', 'incubation', 'economics'
+  final String
+  category; // 'health', 'brooding', 'biosecurity', 'egg_production', 'quail', 'nutrition', 'incubation', 'economics'
   final List<String> tags;
   final String imageUrl;
   final String author;

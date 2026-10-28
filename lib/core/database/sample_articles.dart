@@ -5,8 +5,10 @@ final sampleArticles = [
     id: 'art_brooding_survival',
     slug: 'chick-brooding-mortality-prevention',
     titleEn: 'Day-Old Chick Brooding: Critical Temperature and Early Hydration',
-    titleFr: 'Démarrage des Poussins: Température Critique et Hydratation Précoce',
-    titleAr: 'تحضين الكتاكيت: درجات الحرارة الحرجة والترطيب المبكر للحد من النفوق',
+    titleFr:
+        'Démarrage des Poussins: Température Critique et Hydratation Précoce',
+    titleAr:
+        'تحضين الكتاكيت: درجات الحرارة الحرجة والترطيب المبكر للحد من النفوق',
     summaryEn:
         'The first 72 hours determine flock survival. Learn proper brooder temperature gradients, glucose-electrolyte hydration, and draft control to prevent early mortality.',
     summaryFr:
@@ -68,7 +70,8 @@ L'accès à l'eau tempérée (18°C à 22°C) doit précéder la distribution de
     id: 'art_vaccination_biosecurity',
     slug: 'poultry-vaccination-cold-chain-safety',
     titleEn: 'Flock Vaccination Protocols and Cold-Chain Integrity',
-    titleFr: 'Protocoles de Vaccination Avicole et Respect de la Chaîne du Froid',
+    titleFr:
+        'Protocoles de Vaccination Avicole et Respect de la Chaîne du Froid',
     titleAr: 'بروتوكولات تحصين الدواجن وضمان سلامة السلسلة الباردة للقاحات',
     summaryEn:
         'Live vaccines are easily inactivated by chlorine, heat, or improper administration. Learn critical steps for Newcastle, Gumboro (IBD), and Bronchitis immunization.',
@@ -117,8 +120,10 @@ Les vaccins vivants (Newcastle LaSota, Gumboro, Bronchite Infectieuse) doivent �
   Article(
     id: 'art_eggshell_nutrition',
     slug: 'eggshell-quality-calcium-phosphorus-nutrition',
-    titleEn: 'Optimizing Layer Nutrition: Calcium, Phosphorus, and Shell Strength',
-    titleFr: 'Nutrition des Pondeuses: Calcium, Phosphore et Solidité de la Coquille',
+    titleEn:
+        'Optimizing Layer Nutrition: Calcium, Phosphorus, and Shell Strength',
+    titleFr:
+        'Nutrition des Pondeuses: Calcium, Phosphore et Solidité de la Coquille',
     titleAr: 'تغذية الدجاج البياض: توازن الكالسيوم والفوسفور لصلابة قشرة البيض',
     summaryEn:
         'Cracked eggs reduce farm revenue. Discover coarse limestone particle timing, phytase benefits, and phosphorus ratios to prevent weak shells and cage layer fatigue.',
@@ -173,9 +178,12 @@ Le ratio Calcium/Phosphore disponible doit rester rigoureusement contrôlé avec
   Article(
     id: 'art_biosecurity_farm_defense',
     slug: 'poultry-farm-biosecurity-sanitation',
-    titleEn: 'Biosecurity in Practice: Perimeter Defense, Footbaths, and Rodent Control',
-    titleFr: 'Biosécurité Pratique: Défense Périmétrique, Pédiluves et Dératisation',
-    titleAr: 'الأمن الحيوي الميداني: حماية المحيط الخارجي، مغاطس الأقدام، ومكافحة القوارض',
+    titleEn:
+        'Biosecurity in Practice: Perimeter Defense, Footbaths, and Rodent Control',
+    titleFr:
+        'Biosécurité Pratique: Défense Périmétrique, Pédiluves et Dératisation',
+    titleAr:
+        'الأمن الحيوي الميداني: حماية المحيط الخارجي، مغاطس الأقدام، ومكافحة القوارض',
     summaryEn:
         'Prevention is far cheaper than treating an outbreak. Establish strict Danish entry benches, effective disinfectant contact times, and wild bird exclusion netting.',
     summaryFr:
@@ -241,9 +249,12 @@ Un pédiluve souillé de litière devient inefficace. Brossez d'abord les semell
   Article(
     id: 'art_quail_management',
     slug: 'coturnix-quail-farming-essentials',
-    titleEn: 'Coturnix Quail Management: Density, Light Cycles, and Egg Collection',
-    titleFr: 'Élevage de la Caille du Japon: Densité, Éclairage et Collecte d\'Œufs',
-    titleAr: 'تربية السمان الياباني: الكثافة المثالية، برامج الإضاءة، وجمع البيض',
+    titleEn:
+        'Coturnix Quail Management: Density, Light Cycles, and Egg Collection',
+    titleFr:
+        'Élevage de la Caille du Japon: Densité, Éclairage et Collecte d\'Œufs',
+    titleAr:
+        'تربية السمان الياباني: الكثافة المثالية، برامج الإضاءة، وجمع البيض',
     summaryEn:
         'Japanese quail mature rapidly in 6 weeks. Discover ideal cage stocking density, 16-hour photoperiods for peak lay, and proper egg handling to avoid shell micro-cracks.',
     summaryFr:

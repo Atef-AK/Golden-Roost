@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../core/localization/app_translations.dart';
 import '../../core/theme/app_theme.dart';
 
@@ -7,6 +8,7 @@ class QuickActionSheet extends StatelessWidget {
   final VoidCallback onLogWater;
   final VoidCallback onCollectEggs;
   final VoidCallback onRecordMortality;
+  final VoidCallback? onRecordSale;
   final VoidCallback onAddExpense;
   final VoidCallback onAddIncome;
   final VoidCallback onAddVaccineOrTask;
@@ -18,6 +20,7 @@ class QuickActionSheet extends StatelessWidget {
     required this.onLogWater,
     required this.onCollectEggs,
     required this.onRecordMortality,
+    this.onRecordSale,
     required this.onAddExpense,
     required this.onAddIncome,
     required this.onAddVaccineOrTask,
@@ -30,11 +33,13 @@ class QuickActionSheet extends StatelessWidget {
     required VoidCallback onLogWater,
     required VoidCallback onCollectEggs,
     required VoidCallback onRecordMortality,
+    VoidCallback? onRecordSale,
     required VoidCallback onAddExpense,
     required VoidCallback onAddIncome,
     required VoidCallback onAddVaccineOrTask,
     required VoidCallback onNewIncubation,
   }) {
+    HapticFeedback.mediumImpact();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -44,6 +49,7 @@ class QuickActionSheet extends StatelessWidget {
         onLogWater: onLogWater,
         onCollectEggs: onCollectEggs,
         onRecordMortality: onRecordMortality,
+        onRecordSale: onRecordSale,
         onAddExpense: onAddExpense,
         onAddIncome: onAddIncome,
         onAddVaccineOrTask: onAddVaccineOrTask,
@@ -62,8 +68,9 @@ class QuickActionSheet extends StatelessWidget {
         title: context.tr('feed_log_consumption'),
         subtitle: context.tr('dash_quick_feed'),
         icon: Icons.grain_rounded,
-        color: AppColors.primaryTeal,
+        color: AppColors.forestEmerald,
         onTap: () {
+          HapticFeedback.lightImpact();
           Navigator.pop(context);
           onLogFeed();
         },
@@ -72,8 +79,9 @@ class QuickActionSheet extends StatelessWidget {
         title: context.tr('eggs_collect'),
         subtitle: context.tr('dash_quick_eggs'),
         icon: Icons.egg_outlined,
-        color: AppColors.warning,
+        color: AppColors.goldenHarvest,
         onTap: () {
+          HapticFeedback.lightImpact();
           Navigator.pop(context);
           onCollectEggs();
         },
@@ -84,6 +92,7 @@ class QuickActionSheet extends StatelessWidget {
         icon: Icons.water_drop_outlined,
         color: AppColors.info,
         onTap: () {
+          HapticFeedback.lightImpact();
           Navigator.pop(context);
           onLogWater();
         },
@@ -94,16 +103,30 @@ class QuickActionSheet extends StatelessWidget {
         icon: Icons.heart_broken_outlined,
         color: AppColors.error,
         onTap: () {
+          HapticFeedback.lightImpact();
           Navigator.pop(context);
           onRecordMortality();
         },
       ),
+      if (onRecordSale != null)
+        _QuickActionItem(
+          title: context.tr('dash_quick_sale'),
+          subtitle: context.tr('flocks_movement_sale'),
+          icon: Icons.sell_outlined,
+          color: AppColors.freshLeaf,
+          onTap: () {
+            HapticFeedback.lightImpact();
+            Navigator.pop(context);
+            onRecordSale!();
+          },
+        ),
       _QuickActionItem(
         title: context.tr('finance_add_expense'),
         subtitle: context.tr('finance_operating_costs'),
         icon: Icons.receipt_long_outlined,
         color: const Color(0xFFC0403B),
         onTap: () {
+          HapticFeedback.lightImpact();
           Navigator.pop(context);
           onAddExpense();
         },
@@ -114,6 +137,7 @@ class QuickActionSheet extends StatelessWidget {
         icon: Icons.trending_up_rounded,
         color: AppColors.success,
         onTap: () {
+          HapticFeedback.lightImpact();
           Navigator.pop(context);
           onAddIncome();
         },
@@ -121,9 +145,10 @@ class QuickActionSheet extends StatelessWidget {
       _QuickActionItem(
         title: context.tr('tasks_new_title'),
         subtitle: context.tr('dash_todays_tasks'),
-        icon: Icons.calendar_today_outlined,
-        color: const Color(0xFF6366F1),
+        icon: Icons.event_note_outlined,
+        color: const Color(0xFF5B67CA),
         onTap: () {
+          HapticFeedback.lightImpact();
           Navigator.pop(context);
           onAddVaccineOrTask();
         },
@@ -132,8 +157,9 @@ class QuickActionSheet extends StatelessWidget {
         title: context.tr('incubator_new_batch'),
         subtitle: context.tr('incubator_title'),
         icon: Icons.wb_incandescent_outlined,
-        color: AppColors.warning,
+        color: AppColors.goldenHarvest,
         onTap: () {
+          HapticFeedback.lightImpact();
           Navigator.pop(context);
           onNewIncubation();
         },
@@ -142,164 +168,197 @@ class QuickActionSheet extends StatelessWidget {
 
     return Container(
       constraints: BoxConstraints(
-        maxHeight: MediaQuery.sizeOf(context).height * 0.85,
+        maxHeight: MediaQuery.sizeOf(context).height * 0.88,
       ),
       decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.cardBackgroundDark
-            : AppColors.cardBackgroundLight,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         border: Border(
           top: BorderSide(
             color: isDark ? AppColors.borderDark : AppColors.borderLight,
             width: 1,
           ),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(isDark ? 90 : 25),
+            blurRadius: 30,
+            offset: const Offset(0, -6),
+          ),
+        ],
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Handle
               Center(
                 child: Container(
-                  width: 36,
-                  height: 4,
+                  width: 42,
+                  height: 4.5,
                   decoration: BoxDecoration(
                     color: isDark
-                        ? AppColors.borderDark
-                        : AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
+                        ? const Color(0xFF2C3930)
+                        : const Color(0xFFD6DDD4),
+                    borderRadius: BorderRadius.circular(3),
                   ),
                 ),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
+              // Header Row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          context.tr('dash_quick_action'),
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: isDark
-                                ? AppColors.textPrimaryDark
-                                : AppColors.textPrimaryLight,
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.forestEmerald.withAlpha(
+                            isDark ? 50 : 22,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        Text(
-                          context.tr('dash_quick_action_sub'),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondaryLight,
+                        child: const Icon(
+                          Icons.bolt_rounded,
+                          color: AppColors.forestEmerald,
+                          size: 22,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            context.tr('dash_quick_action'),
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -0.2,
+                              color: isDark
+                                  ? AppColors.textPrimaryDark
+                                  : AppColors.textPrimaryLight,
+                            ),
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
+                          Text(
+                            context.tr('dash_quick_actions_subtitle'),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark
+                                  ? AppColors.textSecondaryDark
+                                  : AppColors.textSecondaryLight,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close, size: 20),
+                    style: IconButton.styleFrom(
+                      backgroundColor: isDark
+                          ? const Color(0xFF1E2721)
+                          : const Color(0xFFF0F4EF),
+                    ),
+                    icon: const Icon(Icons.close_rounded, size: 20),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 18),
               Flexible(
                 child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      final isWide = constraints.maxWidth > 500;
-                      final crossAxisCount = isWide ? 4 : 2;
+                      final isWide = constraints.maxWidth > 550;
+                      final crossAxisCount = isWide ? 3 : 2;
 
                       return GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: crossAxisCount,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          childAspectRatio: isWide ? 1.4 : 1.18,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: isWide ? 1.6 : 1.32,
                         ),
                         itemCount: actions.length,
                         itemBuilder: (context, i) {
                           final a = actions[i];
-                          return InkWell(
-                            onTap: a.onTap,
-                            borderRadius: BorderRadius.circular(12),
-                            child: Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? AppColors.pageBackgroundDark
-                                    : const Color(0xFFF8FAFB),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
+                          return Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: a.onTap,
+                              borderRadius: BorderRadius.circular(16),
+                              child: Ink(
+                                padding: const EdgeInsets.all(14),
+                                decoration: BoxDecoration(
                                   color: isDark
-                                      ? AppColors.borderDark
-                                      : AppColors.borderLight,
-                                  width: 1,
+                                      ? const Color(0xFF16201B)
+                                      : const Color(0xFFFAFAF7),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: isDark
+                                        ? const Color(0xFF26332A)
+                                        : const Color(0xFFE5EAE3),
+                                    width: 1,
+                                  ),
                                 ),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    width: 32,
-                                    height: 32,
-                                    decoration: BoxDecoration(
-                                      color: a.color.withAlpha(24),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Icon(
-                                      a.icon,
-                                      color: a.color,
-                                      size: 18,
-                                    ),
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        a.title,
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w700,
-                                          color: isDark
-                                              ? AppColors.textPrimaryDark
-                                              : AppColors.textPrimaryLight,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      width: 36,
+                                      height: 36,
+                                      decoration: BoxDecoration(
+                                        color: a.color.withAlpha(
+                                          isDark ? 45 : 24,
                                         ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
-                                      Text(
-                                        a.subtitle,
-                                        style: TextStyle(
-                                          fontSize: 10.5,
-                                          color: isDark
-                                              ? AppColors.textTertiaryDark
-                                              : AppColors.textSecondaryLight,
+                                      child: Icon(
+                                        a.icon,
+                                        color: a.color,
+                                        size: 20,
+                                      ),
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          a.title,
+                                          style: TextStyle(
+                                            fontSize: 13.5,
+                                            fontWeight: FontWeight.w700,
+                                            color: isDark
+                                                ? AppColors.textPrimaryDark
+                                                : AppColors.textPrimaryLight,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          a.subtitle,
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: isDark
+                                                ? AppColors.textSecondaryDark
+                                                : AppColors.textSecondaryLight,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           );

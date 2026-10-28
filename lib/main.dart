@@ -45,6 +45,7 @@ class GoldenRoostApp extends ConsumerWidget {
         Locale('en', ''),
         Locale('fr', ''),
         Locale('ar', ''),
+        Locale('es', ''),
       ],
       localizationsDelegates: const [
         WesternArabicMaterialLocalizationsDelegate(),

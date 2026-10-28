@@ -320,7 +320,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                                   ),
                                   const SizedBox(width: 8),
                                   StatusBadge(
-                                    label: '${f.currentCount} ${context.tr('movement_live')}',
+                                    label:
+                                        '${f.currentCount} ${context.tr('movement_live')}',
                                     variant: BadgeVariant.success,
                                   ),
                                 ],

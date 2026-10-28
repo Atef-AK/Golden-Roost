@@ -11,11 +11,16 @@ class AdminDashboardScreen extends StatelessWidget {
   Future<void> _launchWebAdmin(BuildContext context) async {
     final uri = Uri.parse(webAdminUrl);
     try {
-      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
       if (!launched && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Could not open browser. Please navigate to goldenroost.com/admin/login'),
+            content: Text(
+              'Could not open browser. Please navigate to goldenroost.com/admin/login',
+            ),
           ),
         );
       }
@@ -33,9 +38,7 @@ class AdminDashboardScreen extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Administration Portal'),
-      ),
+      appBar: AppBar(title: const Text('Administration Portal')),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -62,10 +65,7 @@ class AdminDashboardScreen extends StatelessWidget {
                   const SizedBox(height: 20),
                   const Text(
                     'Golden Roost Web Console',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                    ),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 10),
@@ -74,7 +74,9 @@ class AdminDashboardScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       height: 1.5,
-                      color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                      color: isDark
+                          ? AppColors.textMutedDark
+                          : AppColors.textMutedLight,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -82,7 +84,9 @@ class AdminDashboardScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E2522) : const Color(0xFFF0F5F1),
+                      color: isDark
+                          ? const Color(0xFF1E2522)
+                          : const Color(0xFFF0F5F1),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: AppColors.primaryTeal.withAlpha(40),
@@ -102,7 +106,9 @@ class AdminDashboardScreen extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: isDark ? Colors.white70 : const Color(0xFF2C3E2D),
+                              color: isDark
+                                  ? Colors.white70
+                                  : const Color(0xFF2C3E2D),
                             ),
                           ),
                         ),
@@ -124,7 +130,10 @@ class AdminDashboardScreen extends StatelessWidget {
                       icon: const Icon(Icons.open_in_new, size: 18),
                       label: const Text(
                         'Open Web Admin Console',
-                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15,
+                        ),
                       ),
                     ),
                   ),

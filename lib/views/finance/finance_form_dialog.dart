@@ -115,8 +115,8 @@ class _FinanceFormDialogState extends ConsumerState<FinanceFormDialog> {
         widget.initialTransaction != null
             ? '${context.tr('edit')} ${context.tr('nav_finances')}'
             : (_type == 'expense'
-                ? context.tr('finance_add_expense')
-                : context.tr('finance_add_income')),
+                  ? context.tr('finance_add_expense')
+                  : context.tr('finance_add_income')),
       ),
       content: SingleChildScrollView(
         child: Form(

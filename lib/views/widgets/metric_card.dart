@@ -38,8 +38,9 @@ class _MetricCardState extends State<MetricCard> {
     final resolvedColor =
         widget.cardColor ??
         (isDark ? AppColors.cardBackgroundDark : AppColors.cardBackgroundLight);
-    final resolvedBorderColor =
-        isDark ? AppColors.borderDark : AppColors.borderLight;
+    final resolvedBorderColor = isDark
+        ? AppColors.borderDark
+        : AppColors.borderLight;
     final color = widget.iconColor ?? AppColors.primaryTeal;
 
     final cardContent = AnimatedScale(
@@ -94,7 +95,10 @@ class _MetricCardState extends State<MetricCard> {
                             gradient: LinearGradient(
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
-                              colors: [color, Color.lerp(color, Colors.black, 0.25)!],
+                              colors: [
+                                color,
+                                Color.lerp(color, Colors.black, 0.25)!,
+                              ],
                             ),
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
@@ -105,7 +109,11 @@ class _MetricCardState extends State<MetricCard> {
                               ),
                             ],
                           ),
-                          child: Icon(widget.icon, color: Colors.white, size: 19),
+                          child: Icon(
+                            widget.icon,
+                            color: Colors.white,
+                            size: 19,
+                          ),
                         ),
                         if (widget.trailing != null)
                           Flexible(child: widget.trailing!)

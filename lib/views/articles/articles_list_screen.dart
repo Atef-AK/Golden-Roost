@@ -33,10 +33,7 @@ class ArticlesListScreen extends ConsumerWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.tr('articles_title')),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: Text(context.tr('articles_title')), elevation: 0),
       body: ResponsiveContainer(
         maxWidth: 1000,
         child: Column(
@@ -55,8 +52,9 @@ class ArticlesListScreen extends ConsumerWidget {
                           onPressed: () {
                             searchController.clear();
                             ref
-                                .read(articleSearchQueryProvider.notifier)
-                                .state = '';
+                                    .read(articleSearchQueryProvider.notifier)
+                                    .state =
+                                '';
                           },
                         )
                       : null,
@@ -97,9 +95,8 @@ class ArticlesListScreen extends ConsumerWidget {
                         ? const Color(0xFF1E293B)
                         : const Color(0xFFF1F5F9),
                     onSelected: (selected) {
-                      ref
-                          .read(articleCategoryFilterProvider.notifier)
-                          .state = selected ? cat['id'] : null;
+                      ref.read(articleCategoryFilterProvider.notifier).state =
+                          selected ? cat['id'] : null;
                     },
                   );
                 },
@@ -207,8 +204,10 @@ class _ArticleCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primaryTeal.withAlpha(25),
                     borderRadius: BorderRadius.circular(6),

@@ -96,7 +96,10 @@ class _FeedLogDialogState extends ConsumerState<FeedLogDialog> {
                   initialValue: _selectedFeedId,
                   decoration: InputDecoration(
                     labelText: context.tr('feed_type'),
-                    prefixIcon: const Icon(AppIcons.feed, color: AppColors.semanticSuccess),
+                    prefixIcon: const Icon(
+                      AppIcons.feed,
+                      color: AppColors.semanticSuccess,
+                    ),
                     helperText: selectedFeed != null
                         ? '${context.tr('feed_available_stock_label')}: ${selectedFeed.currentStockKg.toStringAsFixed(1)} ${context.tr('kg')}'
                         : null,
@@ -119,7 +122,10 @@ class _FeedLogDialogState extends ConsumerState<FeedLogDialog> {
                   initialValue: _selectedFlockId,
                   decoration: InputDecoration(
                     labelText: context.tr('flocks_name'),
-                    prefixIcon: const Icon(AppIcons.birds, color: AppColors.primaryTeal),
+                    prefixIcon: const Icon(
+                      AppIcons.birds,
+                      color: AppColors.primaryTeal,
+                    ),
                   ),
                   items: flocks.map((f) {
                     return DropdownMenuItem(
@@ -145,11 +151,15 @@ class _FeedLogDialogState extends ConsumerState<FeedLogDialog> {
                       decoration: InputDecoration(
                         labelText: context.tr('quantity'),
                         prefixIcon: const Icon(Icons.scale_outlined),
-                        suffixText: _useGrams ? context.tr('g') : context.tr('kg'),
+                        suffixText: _useGrams
+                            ? context.tr('g')
+                            : context.tr('kg'),
                       ),
                       onChanged: (_) => setState(() {}),
                       validator: (val) {
-                        if (val == null || val.isEmpty) return context.tr('feed_qty_required');
+                        if (val == null || val.isEmpty) {
+                          return context.tr('feed_qty_required');
+                        }
                         final n = double.tryParse(val);
                         if (n == null || n <= 0) {
                           return context.tr('flocks_count_positive');

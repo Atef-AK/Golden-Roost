@@ -212,7 +212,10 @@ class _FlocksScreenState extends ConsumerState<FlocksScreen>
   Widget _buildFlockList(List<Flock> flocks, {required bool isArchivedList}) {
     if (flocks.isEmpty) {
       return EmptyStateView(
-        iconWidget: const ChickenIcon(size: 38, color: AppColors.primaryTeal),
+        imageAsset: isArchivedList
+            ? null
+            : 'assets/illustrations/empty_states/empty_flocks.jpg',
+        iconWidget: const ChickenIcon(size: 38, color: AppColors.forestEmerald),
         title: isArchivedList
             ? context.tr('flocks_empty_archived_title')
             : context.tr('flocks_empty'),
@@ -274,7 +277,9 @@ class _FlockCard extends StatelessWidget {
         ? (mortalityCount / flock.startCount) * 100
         : 0.0;
 
-    final (speciesIcon, speciesColor) = AppIcons.getSpeciesVisual(flock.species);
+    final (speciesIcon, speciesColor) = AppIcons.getSpeciesVisual(
+      flock.species,
+    );
 
     return PremiumCard(
       onTap: () => context.push('/flocks/${flock.id}'),
@@ -301,15 +306,49 @@ class _FlockCard extends StatelessWidget {
                         ),
                       ),
                       child: Center(
-                        child: flock.species.toLowerCase().contains('layer') || flock.species.toLowerCase().contains('pond')
-                            ? Icon(Icons.egg_rounded, color: speciesColor, size: 20)
-                            : (flock.species.toLowerCase().contains('chick') || flock.species.toLowerCase().contains('poussin')
-                                ? Icon(Icons.child_care_rounded, color: speciesColor, size: 20)
-                                : (flock.species.toLowerCase().contains('duck') || flock.species.toLowerCase().contains('canard')
-                                    ? Icon(Icons.water_outlined, color: speciesColor, size: 20)
-                                    : (flock.species.toLowerCase().contains('turkey') || flock.species.toLowerCase().contains('dinde')
-                                        ? Icon(Icons.pets_rounded, color: speciesColor, size: 20)
-                                        : ChickenIcon(color: speciesColor, size: 20)))),
+                        child:
+                            flock.species.toLowerCase().contains('layer') ||
+                                flock.species.toLowerCase().contains('pond')
+                            ? Icon(
+                                Icons.egg_rounded,
+                                color: speciesColor,
+                                size: 20,
+                              )
+                            : (flock.species.toLowerCase().contains('chick') ||
+                                      flock.species.toLowerCase().contains(
+                                        'poussin',
+                                      )
+                                  ? Icon(
+                                      Icons.child_care_rounded,
+                                      color: speciesColor,
+                                      size: 20,
+                                    )
+                                  : (flock.species.toLowerCase().contains(
+                                              'duck',
+                                            ) ||
+                                            flock.species
+                                                .toLowerCase()
+                                                .contains('canard')
+                                        ? Icon(
+                                            Icons.water_outlined,
+                                            color: speciesColor,
+                                            size: 20,
+                                          )
+                                        : (flock.species.toLowerCase().contains(
+                                                    'turkey',
+                                                  ) ||
+                                                  flock.species
+                                                      .toLowerCase()
+                                                      .contains('dinde')
+                                              ? Icon(
+                                                  Icons.pets_rounded,
+                                                  color: speciesColor,
+                                                  size: 20,
+                                                )
+                                              : ChickenIcon(
+                                                  color: speciesColor,
+                                                  size: 20,
+                                                )))),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -407,7 +446,8 @@ class _FlockCard extends StatelessWidget {
                 _StatCell(
                   label: context.tr('flocks_age'),
                   value: '${flock.ageInDays}${context.tr('flocks_days_short')}',
-                  subtext: '${flock.ageInWeeks} ${context.tr('flocks_weeks_short')}',
+                  subtext:
+                      '${flock.ageInWeeks} ${context.tr('flocks_weeks_short')}',
                 ),
                 _StatCell(
                   label: context.tr('flocks_mortality'),

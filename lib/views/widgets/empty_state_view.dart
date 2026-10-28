@@ -4,6 +4,7 @@ import '../../core/theme/app_theme.dart';
 class EmptyStateView extends StatelessWidget {
   final IconData? icon;
   final Widget? iconWidget;
+  final String? imageAsset;
   final String title;
   final String description;
   final String? buttonText;
@@ -15,6 +16,7 @@ class EmptyStateView extends StatelessWidget {
     super.key,
     this.icon,
     this.iconWidget,
+    this.imageAsset,
     required this.title,
     required this.description,
     this.buttonText,
@@ -35,30 +37,63 @@ class EmptyStateView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 68,
-              height: 68,
-              decoration: BoxDecoration(
-                color: (isDark
-                    ? AppColors.darkGraphiteCard
-                    : AppColors.primaryTealSurface),
-                shape: BoxShape.circle,
-                border: Border.all(
+            if (imageAsset != null)
+              Container(
+                width: 140,
+                height: 140,
+                margin: const EdgeInsets.only(bottom: 12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(isDark ? 50 : 15),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.asset(
+                    imageAsset!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (ctx, err, stack) => Container(
+                      color: AppColors.forestEmerald.withAlpha(30),
+                      child: const Icon(
+                        Icons.agriculture_rounded,
+                        size: 48,
+                        color: AppColors.forestEmerald,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            else
+              Container(
+                width: 68,
+                height: 68,
+                decoration: BoxDecoration(
                   color: (isDark
-                      ? AppColors.borderDark
-                      : AppColors.borderLight),
-                  width: 1,
+                      ? AppColors.darkGraphiteCard
+                      : AppColors.primaryTealSurface),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: (isDark
+                        ? AppColors.borderDark
+                        : AppColors.borderLight),
+                    width: 1,
+                  ),
+                ),
+                child: Center(
+                  child:
+                      iconWidget ??
+                      Icon(
+                        icon ?? Icons.info_outline,
+                        size: 30,
+                        color: AppColors.primaryTeal,
+                      ),
                 ),
               ),
-              child: Center(
-                child: iconWidget ??
-                    Icon(
-                      icon ?? Icons.info_outline,
-                      size: 30,
-                      color: AppColors.primaryTeal,
-                    ),
-              ),
-            ),
             const SizedBox(height: 16),
             Text(
               title,

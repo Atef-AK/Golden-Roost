@@ -99,13 +99,13 @@ class _EggsScreenState extends ConsumerState<EggsScreen>
                   final isWide = constraints.maxWidth >= 600;
                   final crossAxisCount = isWide ? 4 : 2;
 
-                    return GridView.count(
-                      crossAxisCount: crossAxisCount,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      childAspectRatio: isWide ? 2.2 : 1.7,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
+                  return GridView.count(
+                    crossAxisCount: crossAxisCount,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    childAspectRatio: isWide ? 2.2 : 1.7,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
                     children: [
                       _EggKpiCard(
                         label: context.tr('eggs_total_collected_kpi'),
@@ -234,12 +234,14 @@ class _EggsScreenState extends ConsumerState<EggsScreen>
                           ),
                           if (log.crackedEggs > 0)
                             StatusBadge(
-                              label: '${log.crackedEggs} ${context.tr('eggs_cracked_badge')}',
+                              label:
+                                  '${log.crackedEggs} ${context.tr('eggs_cracked_badge')}',
                               variant: BadgeVariant.error,
                             ),
                           if (log.dirtyEggs > 0)
                             StatusBadge(
-                              label: '${log.dirtyEggs} ${context.tr('eggs_dirty_badge')}',
+                              label:
+                                  '${log.dirtyEggs} ${context.tr('eggs_dirty_badge')}',
                               variant: BadgeVariant.warning,
                             ),
                         ],
@@ -390,9 +392,7 @@ class _EggsScreenState extends ConsumerState<EggsScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(context.tr('eggs_delete_log_title')),
-        content: Text(
-          context.tr('eggs_delete_log_confirm'),
-        ),
+        content: Text(context.tr('eggs_delete_log_confirm')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -418,9 +418,7 @@ class _EggsScreenState extends ConsumerState<EggsScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(context.tr('eggs_delete_sale_title')),
-        content: Text(
-          context.tr('eggs_delete_sale_confirm'),
-        ),
+        content: Text(context.tr('eggs_delete_sale_confirm')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -502,7 +500,8 @@ class _EggsScreenState extends ConsumerState<EggsScreen>
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     labelText: context.tr('eggs_sell_qty'),
-                    helperText: '${context.tr('eggs_available_stock_kpi')}: $availableSaleable',
+                    helperText:
+                        '${context.tr('eggs_available_stock_kpi')}: $availableSaleable',
                     prefixIcon: const Icon(Icons.egg),
                   ),
                 ),
@@ -513,7 +512,8 @@ class _EggsScreenState extends ConsumerState<EggsScreen>
                     decimal: true,
                   ),
                   decoration: InputDecoration(
-                    labelText: '${context.tr('eggs_unit_price_label')} ($currency)',
+                    labelText:
+                        '${context.tr('eggs_unit_price_label')} ($currency)',
                     suffixText: currency,
                   ),
                 ),

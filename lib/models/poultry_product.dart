@@ -1,6 +1,7 @@
 class PoultryProduct {
   final String id;
-  final String category; // 'incubators', 'brooders', 'feeders', 'drinkers', 'hygrometers', 'candlers', 'biosecurity'
+  final String
+  category; // 'incubators', 'brooders', 'feeders', 'drinkers', 'hygrometers', 'candlers', 'biosecurity'
   final String nameEn;
   final String nameFr;
   final String nameAr;
@@ -51,8 +52,12 @@ class PoultryProduct {
   }
 
   String localizedDescription(String langCode) {
-    if (langCode == 'ar') return descriptionAr.isNotEmpty ? descriptionAr : descriptionEn;
-    if (langCode == 'fr') return descriptionFr.isNotEmpty ? descriptionFr : descriptionEn;
+    if (langCode == 'ar') {
+      return descriptionAr.isNotEmpty ? descriptionAr : descriptionEn;
+    }
+    if (langCode == 'fr') {
+      return descriptionFr.isNotEmpty ? descriptionFr : descriptionEn;
+    }
     return descriptionEn;
   }
 

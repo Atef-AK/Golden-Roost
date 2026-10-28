@@ -92,7 +92,9 @@ class _TasksCalendarScreenState extends ConsumerState<TasksCalendarScreen> {
                         date.month == DateTime.now().month &&
                         date.day == DateTime.now().day;
 
-                    final localeCode = Localizations.localeOf(context).languageCode;
+                    final localeCode = Localizations.localeOf(
+                      context,
+                    ).languageCode;
 
                     return GestureDetector(
                       onTap: () => setState(() => _selectedDate = date),
@@ -126,7 +128,10 @@ class _TasksCalendarScreenState extends ConsumerState<TasksCalendarScreen> {
                             FittedBox(
                               fit: BoxFit.scaleDown,
                               child: Text(
-                                DateFormat('EEE', localeCode).format(date).toUpperCase(),
+                                DateFormat(
+                                  'EEE',
+                                  localeCode,
+                                ).format(date).toUpperCase(),
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w700,
@@ -140,7 +145,9 @@ class _TasksCalendarScreenState extends ConsumerState<TasksCalendarScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              AppFormatters.toWesternNumerals(date.day.toString()),
+                              AppFormatters.toWesternNumerals(
+                                date.day.toString(),
+                              ),
                               style: TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w800,
@@ -172,11 +179,17 @@ class _TasksCalendarScreenState extends ConsumerState<TasksCalendarScreen> {
                   const SizedBox(width: 8),
                   _buildCatChip('watering', context.tr('tasks_cat_watering')),
                   const SizedBox(width: 8),
-                  _buildCatChip('vaccination', context.tr('tasks_cat_vaccination')),
+                  _buildCatChip(
+                    'vaccination',
+                    context.tr('tasks_cat_vaccination'),
+                  ),
                   const SizedBox(width: 8),
                   _buildCatChip('cleaning', context.tr('tasks_cat_cleaning')),
                   const SizedBox(width: 8),
-                  _buildCatChip('incubation', context.tr('tasks_cat_incubation')),
+                  _buildCatChip(
+                    'incubation',
+                    context.tr('tasks_cat_incubation'),
+                  ),
                 ],
               ),
             ),
@@ -220,20 +233,33 @@ class _TasksCalendarScreenState extends ConsumerState<TasksCalendarScreen> {
                                         .read(tasksProvider.notifier)
                                         .toggleComplete(task);
                                     if (res != null && context.mounted) {
-                                      ref.read(feedInventoryProvider.notifier).loadInventory();
+                                      ref
+                                          .read(feedInventoryProvider.notifier)
+                                          .loadInventory();
                                       ref.invalidate(feedTransactionsProvider);
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
                                         SnackBar(
-                                          backgroundColor: const Color(0xFF0F766E),
+                                          backgroundColor: const Color(
+                                            0xFF0F766E,
+                                          ),
                                           behavior: SnackBarBehavior.floating,
                                           content: Row(
                                             children: [
-                                              const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+                                              const Icon(
+                                                Icons.check_circle_rounded,
+                                                color: Colors.white,
+                                                size: 20,
+                                              ),
                                               const SizedBox(width: 8),
                                               Expanded(
                                                 child: Text(
                                                   '${context.tr('feed_task_completed_deducted')}: ${res.deductedKg.toStringAsFixed(1)} kg (${res.feedName})',
-                                                  style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    color: Colors.white,
+                                                  ),
                                                 ),
                                               ),
                                             ],
@@ -271,7 +297,9 @@ class _TasksCalendarScreenState extends ConsumerState<TasksCalendarScreen> {
                                       Row(
                                         children: [
                                           StatusBadge(
-                                            label: context.trTaskCategory(task.category),
+                                            label: context.trTaskCategory(
+                                              task.category,
+                                            ),
                                             variant: isVaccine
                                                 ? BadgeVariant.error
                                                 : BadgeVariant.primary,
@@ -361,7 +389,10 @@ class _TasksCalendarScreenState extends ConsumerState<TasksCalendarScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const Icon(Icons.edit_outlined, color: AppColors.primaryTeal),
+                leading: const Icon(
+                  Icons.edit_outlined,
+                  color: AppColors.primaryTeal,
+                ),
                 title: Text(context.tr('edit')),
                 subtitle: Text(context.tr('tasks_edit_subtitle')),
                 onTap: () {

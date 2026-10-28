@@ -112,13 +112,19 @@ class _BirdMovementDialogState extends ConsumerState<BirdMovementDialog> {
               DropdownButtonFormField<String>(
                 isExpanded: true,
                 initialValue: _type,
-                decoration: InputDecoration(labelText: context.tr('movement_event_type')),
+                decoration: InputDecoration(
+                  labelText: context.tr('movement_event_type'),
+                ),
                 items: [
                   DropdownMenuItem(
                     value: 'mortality',
                     child: Row(
                       children: [
-                        const Icon(AppIcons.mortality, size: 18, color: AppColors.error),
+                        const Icon(
+                          AppIcons.mortality,
+                          size: 18,
+                          color: AppColors.error,
+                        ),
                         const SizedBox(width: 8),
                         Text(context.tr('movement_mortality')),
                       ],
@@ -128,7 +134,11 @@ class _BirdMovementDialogState extends ConsumerState<BirdMovementDialog> {
                     value: 'cull',
                     child: Row(
                       children: [
-                        const Icon(Icons.remove_circle_outline, size: 18, color: AppColors.warning),
+                        const Icon(
+                          Icons.remove_circle_outline,
+                          size: 18,
+                          color: AppColors.warning,
+                        ),
                         const SizedBox(width: 8),
                         Text(context.tr('movement_cull')),
                       ],
@@ -138,7 +148,11 @@ class _BirdMovementDialogState extends ConsumerState<BirdMovementDialog> {
                     value: 'sale',
                     child: Row(
                       children: [
-                        const Icon(AppIcons.sale, size: 18, color: AppColors.semanticSuccess),
+                        const Icon(
+                          AppIcons.sale,
+                          size: 18,
+                          color: AppColors.semanticSuccess,
+                        ),
                         const SizedBox(width: 8),
                         Text(context.tr('movement_sale')),
                       ],
@@ -148,7 +162,10 @@ class _BirdMovementDialogState extends ConsumerState<BirdMovementDialog> {
                     value: 'purchase',
                     child: Row(
                       children: [
-                        const ChickenIcon(size: 18, color: AppColors.primaryTeal),
+                        const ChickenIcon(
+                          size: 18,
+                          color: AppColors.primaryTeal,
+                        ),
                         const SizedBox(width: 8),
                         Text(context.tr('movement_purchase')),
                       ],
@@ -211,7 +228,8 @@ class _BirdMovementDialogState extends ConsumerState<BirdMovementDialog> {
                     decimal: true,
                   ),
                   decoration: InputDecoration(
-                    labelText: '${context.tr('movement_price_per_bird')} ($currency)',
+                    labelText:
+                        '${context.tr('movement_price_per_bird')} ($currency)',
                     suffixText: currency,
                   ),
                 ),

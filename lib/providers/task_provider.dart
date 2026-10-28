@@ -61,7 +61,8 @@ class TasksNotifier extends StateNotifier<List<TaskItem>> {
       // Auto feed deduction if category or title indicates feeding
       final cat = task.category.toLowerCase().trim();
       final title = task.title.toLowerCase().trim();
-      final isFeeding = cat == 'feeding' ||
+      final isFeeding =
+          cat == 'feeding' ||
           cat == 'nourriture' ||
           title.contains('feed') ||
           title.contains('علف') ||
@@ -69,7 +70,8 @@ class TasksNotifier extends StateNotifier<List<TaskItem>> {
           title.contains('nourrir');
 
       if (isFeeding) {
-        feedResult = await FeedAutomationService.instance.deductForCompletedTask(task);
+        feedResult = await FeedAutomationService.instance
+            .deductForCompletedTask(task);
       }
 
       // Automatically generate next recurring instance if recurring

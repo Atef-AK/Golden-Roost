@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import '../core/localization/app_translations.dart';
 import '../core/theme/app_theme.dart';
@@ -25,11 +26,8 @@ class MainShell extends StatelessWidget {
         label: context.tr('nav_dashboard'),
       ),
       _NavDestination(
-        customWidget: (ctx, isSelected, color) => ChickenIcon(
-          size: 21,
-          color: color,
-          outlined: !isSelected,
-        ),
+        customWidget: (ctx, isSelected, color) =>
+            ChickenIcon(size: 22, color: color, outlined: !isSelected),
         label: context.tr('nav_flocks'),
       ),
       _NavDestination(
@@ -50,22 +48,24 @@ class MainShell extends StatelessWidget {
     ];
 
     if (!isWide) {
-      // Mobile Layout: Bespoke Enterprise Docked Bar
+      // Mobile Layout: Premium Golden Roost 2.0 Docked Navigation Bar
       return Scaffold(
         body: navigationShell,
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF0C1322) : Colors.white,
+            color: isDark ? AppColors.pageBackgroundDark : Colors.white,
             border: Border(
               top: BorderSide(
-                color: isDark ? const Color(0xFF1E283D) : const Color(0xFFE2E8F0),
-                width: 0.8,
+                color: isDark
+                    ? const Color(0xFF1E2822)
+                    : const Color(0xFFE4E9E1),
+                width: 1.0,
               ),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withAlpha(isDark ? 90 : 10),
-                blurRadius: 16,
+                color: Colors.black.withAlpha(isDark ? 80 : 12),
+                blurRadius: 20,
                 offset: const Offset(0, -4),
               ),
             ],
@@ -73,7 +73,7 @@ class MainShell extends StatelessWidget {
           child: SafeArea(
             top: false,
             child: SizedBox(
-              height: 60,
+              height: 64,
               child: Row(
                 children: List.generate(destinations.length, (index) {
                   final d = destinations[index];
@@ -81,9 +81,11 @@ class MainShell extends StatelessWidget {
                   return Expanded(
                     child: InkWell(
                       onTap: () {
+                        HapticFeedback.selectionClick();
                         navigationShell.goBranch(
                           index,
-                          initialLocation: index == navigationShell.currentIndex,
+                          initialLocation:
+                              index == navigationShell.currentIndex,
                         );
                       },
                       splashColor: Colors.transparent,
@@ -92,19 +94,19 @@ class MainShell extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
+                            duration: const Duration(milliseconds: 220),
                             curve: Curves.easeOutCubic,
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 3.5,
+                              horizontal: 16,
+                              vertical: 4,
                             ),
                             decoration: BoxDecoration(
                               color: isSelected
                                   ? (isDark
-                                      ? AppColors.primaryTeal.withAlpha(56)
-                                      : AppColors.primaryTeal.withAlpha(30))
+                                        ? AppColors.forestEmerald.withAlpha(55)
+                                        : AppColors.forestEmerald.withAlpha(22))
                                   : Colors.transparent,
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(20),
                             ),
                             child: d.customWidget != null
                                 ? d.customWidget!(
@@ -112,37 +114,40 @@ class MainShell extends StatelessWidget {
                                     isSelected,
                                     isSelected
                                         ? (isDark
-                                            ? AppColors.primaryTealLight
-                                            : AppColors.primaryTeal)
+                                              ? AppColors.freshLeaf
+                                              : AppColors.forestEmerald)
                                         : (isDark
-                                            ? const Color(0xFF64748B)
-                                            : const Color(0xFF94A3B8)),
+                                              ? const Color(0xFF6B7C72)
+                                              : AppColors.secondaryText),
                                   )
                                 : Icon(
                                     isSelected ? d.selectedIcon! : d.icon!,
-                                    size: 21,
+                                    size: 22,
                                     color: isSelected
                                         ? (isDark
-                                            ? AppColors.primaryTealLight
-                                            : AppColors.primaryTeal)
+                                              ? AppColors.freshLeaf
+                                              : AppColors.forestEmerald)
                                         : (isDark
-                                            ? const Color(0xFF64748B)
-                                            : const Color(0xFF94A3B8)),
+                                              ? const Color(0xFF6B7C72)
+                                              : AppColors.secondaryText),
                                   ),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             d.label,
                             style: TextStyle(
-                              fontSize: 10.5,
-                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                              fontSize: 11,
+                              fontWeight: isSelected
+                                  ? FontWeight.w800
+                                  : FontWeight.w500,
+                              letterSpacing: isSelected ? -0.1 : 0,
                               color: isSelected
                                   ? (isDark
-                                      ? AppColors.textPrimaryDark
-                                      : AppColors.textPrimaryLight)
+                                        ? Colors.white
+                                        : AppColors.forestEmerald)
                                   : (isDark
-                                      ? const Color(0xFF64748B)
-                                      : const Color(0xFF94A3B8)),
+                                        ? const Color(0xFF6B7C72)
+                                        : AppColors.secondaryText),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -159,59 +164,73 @@ class MainShell extends StatelessWidget {
       );
     }
 
-    // Tablet & Desktop Layout: NavigationRail or Wide Sidebar
+    // Tablet & Desktop Layout: NavigationRail with Brand Header
     return Scaffold(
       body: Row(
         children: [
           NavigationRail(
             selectedIndex: navigationShell.currentIndex,
             onDestinationSelected: (index) {
+              HapticFeedback.selectionClick();
               navigationShell.goBranch(
                 index,
                 initialLocation: index == navigationShell.currentIndex,
               );
             },
             extended: isDesktop,
-            minExtendedWidth: 200,
+            minExtendedWidth: 220,
+            backgroundColor: isDark
+                ? AppColors.pageBackgroundDark
+                : Colors.white,
             leading: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryTeal,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.agriculture_rounded,
-                      color: Colors.white,
-                      size: 22,
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.asset(
+                      'assets/brand/app_icon_golden_roost.jpg',
+                      width: 40,
+                      height: 40,
+                      fit: BoxFit.cover,
+                      errorBuilder: (ctx, err, stack) => Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: AppColors.forestEmerald,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.agriculture_rounded,
+                          color: Colors.white,
+                          size: 22,
+                        ),
+                      ),
                     ),
                   ),
                   if (isDesktop) ...[
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 12),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           context.tr('app_title'),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w800,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w900,
                             fontSize: 16,
                             letterSpacing: -0.3,
-                            color: AppColors.primaryTeal,
+                            color: isDark
+                                ? Colors.white
+                                : AppColors.forestEmerald,
                           ),
                         ),
                         Text(
-                          'Poultry Manager',
+                          'Golden Roost 2.0',
                           style: TextStyle(
                             fontSize: 11,
-                            color: isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondaryLight,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.goldenHarvest,
                           ),
                         ),
                       ],
@@ -228,8 +247,8 @@ class MainShell extends StatelessWidget {
                             context,
                             false,
                             isDark
-                                ? const Color(0xFF64748B)
-                                : const Color(0xFF94A3B8),
+                                ? const Color(0xFF6B7C72)
+                                : AppColors.secondaryText,
                           )
                         : Icon(d.icon),
                     selectedIcon: d.customWidget != null
@@ -237,16 +256,23 @@ class MainShell extends StatelessWidget {
                             context,
                             true,
                             isDark
-                                ? AppColors.primaryTealLight
-                                : AppColors.primaryTeal,
+                                ? AppColors.freshLeaf
+                                : AppColors.forestEmerald,
                           )
                         : Icon(d.selectedIcon),
-                    label: Text(d.label),
+                    label: Text(
+                      d.label,
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ),
                   ),
                 )
                 .toList(),
           ),
-          const VerticalDivider(width: 1, thickness: 1),
+          VerticalDivider(
+            width: 1,
+            thickness: 1,
+            color: isDark ? const Color(0xFF1E2822) : const Color(0xFFE4E9E1),
+          ),
           Expanded(
             child: ResponsiveContainer(maxWidth: 1200, child: navigationShell),
           ),
@@ -259,7 +285,8 @@ class MainShell extends StatelessWidget {
 class _NavDestination {
   final IconData? icon;
   final IconData? selectedIcon;
-  final Widget Function(BuildContext context, bool isSelected, Color color)? customWidget;
+  final Widget Function(BuildContext context, bool isSelected, Color color)?
+  customWidget;
   final String label;
 
   const _NavDestination({

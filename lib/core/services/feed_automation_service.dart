@@ -46,7 +46,9 @@ class FeedAutomationService {
     final demands = <String, double>{};
     double total = 0.0;
 
-    for (final flock in flocks.where((f) => !f.isArchived && f.currentCount > 0)) {
+    for (final flock in flocks.where(
+      (f) => !f.isArchived && f.currentCount > 0,
+    )) {
       final demand = FarmCalculations.calculateFlockDailyDemandKg(
         birdCount: flock.currentCount,
         species: flock.species,
@@ -58,10 +60,7 @@ class FeedAutomationService {
       total += demand;
     }
 
-    return FeedForecastResult(
-      flockDemandsKg: demands,
-      totalDemandKg: total,
-    );
+    return FeedForecastResult(flockDemandsKg: demands, totalDemandKg: total);
   }
 
   /// Records an actual, verified feeding event for a flock.
@@ -106,7 +105,10 @@ class FeedAutomationService {
         // Roll back estimated deduction in inventory
         final rolledBackStock = feedItem.currentStockKg + estTx.quantityKg;
         await db.updateFeedItem(
-          feedItem.copyWith(currentStockKg: rolledBackStock, updatedAt: DateTime.now()),
+          feedItem.copyWith(
+            currentStockKg: rolledBackStock,
+            updatedAt: DateTime.now(),
+          ),
         );
         // Delete estimated transaction so the actual entry supersedes it
         await db.deleteFeedTransaction(estTx.id);
@@ -153,14 +155,18 @@ class FeedAutomationService {
     // Guard: strictly check user setting
     final settings = await db.getSettings();
     if (!settings.autoFeedDeduction) {
-      debugPrint('[FeedAutomation] Auto feed deduction is disabled in settings. Skipping.');
+      debugPrint(
+        '[FeedAutomation] Auto feed deduction is disabled in settings. Skipping.',
+      );
       return results;
     }
 
     final now = forDate ?? DateTime.now();
 
     final allFlocks = await db.getFlocks();
-    final activeFlocks = allFlocks.where((f) => !f.isArchived && f.currentCount > 0).toList();
+    final activeFlocks = allFlocks
+        .where((f) => !f.isArchived && f.currentCount > 0)
+        .toList();
     if (activeFlocks.isEmpty) return results;
 
     final inventory = await db.getFeedInventory();
@@ -204,14 +210,18 @@ class FeedAutomationService {
         date: now,
         type: 'consumption',
         quantityKg: double.parse(deductKg.toStringAsFixed(2)),
-        notes: '$estimatedTag Auto daily feeding (${flock.name}: ${flock.currentCount} birds, ${flock.ageInWeeks}w)',
+        notes:
+            '$estimatedTag Auto daily feeding (${flock.name}: ${flock.currentCount} birds, ${flock.ageInWeeks}w)',
         createdAt: DateTime.now(),
       );
 
       await db.recordFeedTransaction(tx);
 
       // Refresh local inventory instance stock
-      final updatedStock = (bestFeed.currentStockKg - deductKg).clamp(0.0, 999999.0);
+      final updatedStock = (bestFeed.currentStockKg - deductKg).clamp(
+        0.0,
+        999999.0,
+      );
       final index = inventory.indexWhere((item) => item.id == bestFeed.id);
       if (index != -1) {
         inventory[index] = bestFeed.copyWith(currentStockKg: updatedStock);
@@ -261,8 +271,12 @@ class FeedAutomationService {
       );
       selectedFeed = _findBestFeedItem(targetFlock, inventory);
     } else {
-      final activeFlocks = allFlocks.where((f) => !f.isArchived && f.currentCount > 0).toList();
-      targetName = activeFlocks.isNotEmpty ? '${activeFlocks.length} Flocks' : 'Farm Flock';
+      final activeFlocks = allFlocks
+          .where((f) => !f.isArchived && f.currentCount > 0)
+          .toList();
+      targetName = activeFlocks.isNotEmpty
+          ? '${activeFlocks.length} Flocks'
+          : 'Farm Flock';
       for (final f in activeFlocks) {
         demandKg += FarmCalculations.calculateFlockDailyDemandKg(
           birdCount: f.currentCount,
@@ -291,7 +305,9 @@ class FeedAutomationService {
 
     // Delegate to recordActualFeedConsumption to guarantee reconciliation if an estimate existed
     return await recordActualFeedConsumption(
-      flockId: targetFlock?.id ?? (allFlocks.isNotEmpty ? allFlocks.first.id : 'flock_default'),
+      flockId:
+          targetFlock?.id ??
+          (allFlocks.isNotEmpty ? allFlocks.first.id : 'flock_default'),
       feedId: selectedFeed.id,
       quantityKg: double.parse(deductKg.toStringAsFixed(2)),
       notes: 'Task completed: ${task.title} ($targetName)',
@@ -308,7 +324,9 @@ class FeedAutomationService {
     // 1. Quail match
     if (species.contains('quail')) {
       final quailMatch = withStock.cast<FeedItem?>().firstWhere(
-        (i) => i?.feedType == 'quail' || (i?.name.toLowerCase().contains('quail') ?? false),
+        (i) =>
+            i?.feedType == 'quail' ||
+            (i?.name.toLowerCase().contains('quail') ?? false),
         orElse: () => null,
       );
       if (quailMatch != null) return quailMatch;
@@ -317,7 +335,9 @@ class FeedAutomationService {
     // 2. Layer match
     if (pur.contains('layer') || pur.contains('egg')) {
       final layerMatch = withStock.cast<FeedItem?>().firstWhere(
-        (i) => i?.feedType == 'layer' || (i?.name.toLowerCase().contains('layer') ?? false),
+        (i) =>
+            i?.feedType == 'layer' ||
+            (i?.name.toLowerCase().contains('layer') ?? false),
         orElse: () => null,
       );
       if (layerMatch != null) return layerMatch;

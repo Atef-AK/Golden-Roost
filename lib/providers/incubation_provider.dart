@@ -86,7 +86,9 @@ class IncubationBatchesNotifier extends StateNotifier<List<IncubationBatch>> {
     );
 
     // Save flock as internal transfer without duplicate expense
-    await ref.read(flocksProvider.notifier).addFlock(newFlock, isInternalTransfer: true);
+    await ref
+        .read(flocksProvider.notifier)
+        .addFlock(newFlock, isInternalTransfer: true);
 
     // Mark batch as completed and transferred
     final updatedBatch = batch.copyWith(

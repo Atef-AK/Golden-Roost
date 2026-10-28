@@ -2,8 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/database/database_helper.dart';
 import '../../core/localization/app_translations.dart';
 import '../../core/services/feed_automation_service.dart';
+import '../../core/theme/app_theme.dart';
 import '../../providers/feed_provider.dart';
 import '../widgets/chicken_icon.dart';
 
@@ -61,15 +63,22 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       ref.invalidate(feedTransactionsProvider);
     } catch (_) {}
 
+    // 2. Check onboarding completion
+    final isOnboarded = await DatabaseHelper.instance.isOnboardingCompleted();
+
     // Ensure minimum splash display time for visual excellence
     final elapsed = stopwatch.elapsedMilliseconds;
-    final remaining = 2200 - elapsed;
+    final remaining = 2000 - elapsed;
     if (remaining > 0) {
       await Future.delayed(Duration(milliseconds: remaining));
     }
 
     if (mounted) {
-      context.go('/dashboard');
+      if (isOnboarded) {
+        context.go('/dashboard');
+      } else {
+        context.go('/onboarding');
+      }
     }
   }
 
@@ -82,10 +91,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF080D1A),
+      backgroundColor: const Color(0xFF07110C),
       body: Stack(
         children: [
-          // 1. Ambient Teal/Emerald Radial Halo
+          // 1. Ambient Emerald/Gold Radial Halo
           Positioned(
             top: MediaQuery.of(context).size.height * 0.25 - 160,
             left: MediaQuery.of(context).size.width * 0.5 - 160,
@@ -99,8 +108,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        const Color(0xFF10B981).withAlpha((75 * _glowAnimation.value).toInt()),
-                        const Color(0xFF0F766E).withAlpha((35 * _glowAnimation.value).toInt()),
+                        AppColors.forestEmerald.withAlpha(
+                          (80 * _glowAnimation.value).toInt(),
+                        ),
+                        AppColors.goldenHarvest.withAlpha(
+                          (30 * _glowAnimation.value).toInt(),
+                        ),
                         Colors.transparent,
                       ],
                       stops: const [0.0, 0.55, 1.0],
@@ -129,20 +142,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                         height: 120,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Color(0xFF132338), Color(0xFF0C1624)],
-                          ),
                           border: Border.all(
-                            color: const Color(0xFF10B981).withAlpha(120),
-                            width: 2.0,
+                            color: AppColors.goldenHarvest.withAlpha(160),
+                            width: 2.2,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF10B981).withAlpha(80),
-                              blurRadius: 32,
-                              spreadRadius: 4,
+                              color: AppColors.forestEmerald.withAlpha(90),
+                              blurRadius: 36,
+                              spreadRadius: 6,
                             ),
                             BoxShadow(
                               color: Colors.black.withAlpha(150),
@@ -151,10 +159,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                             ),
                           ],
                         ),
-                        child: const Center(
-                          child: ChickenIcon(
-                            size: 68,
-                            color: Color(0xFF10B981),
+                        child: ClipOval(
+                          child: Image.asset(
+                            'assets/brand/app_icon_golden_roost.jpg',
+                            fit: BoxFit.cover,
+                            errorBuilder: (ctx, err, stack) => const Center(
+                              child: ChickenIcon(
+                                size: 68,
+                                color: AppColors.goldenHarvest,
+                              ),
+                            ),
                           ),
                         ),
                       ),

@@ -101,34 +101,54 @@ class DatabaseHelper {
         }
         if (oldVersion < 4) {
           try {
-            await db.execute("ALTER TABLE farm_settings ADD COLUMN auto_feed_deduction INTEGER NOT NULL DEFAULT 0;");
+            await db.execute(
+              "ALTER TABLE farm_settings ADD COLUMN auto_feed_deduction INTEGER NOT NULL DEFAULT 0;",
+            );
           } catch (_) {}
           try {
-            await db.execute("ALTER TABLE farm_settings ADD COLUMN article_notifications_enabled INTEGER NOT NULL DEFAULT 1;");
+            await db.execute(
+              "ALTER TABLE farm_settings ADD COLUMN article_notifications_enabled INTEGER NOT NULL DEFAULT 1;",
+            );
           } catch (_) {}
           try {
-            await db.execute("ALTER TABLE farm_settings ADD COLUMN marketing_notifications_enabled INTEGER NOT NULL DEFAULT 0;");
+            await db.execute(
+              "ALTER TABLE farm_settings ADD COLUMN marketing_notifications_enabled INTEGER NOT NULL DEFAULT 0;",
+            );
           } catch (_) {}
           try {
-            await db.execute("ALTER TABLE farm_settings ADD COLUMN ads_enabled INTEGER NOT NULL DEFAULT 1;");
+            await db.execute(
+              "ALTER TABLE farm_settings ADD COLUMN ads_enabled INTEGER NOT NULL DEFAULT 1;",
+            );
           } catch (_) {}
           try {
-            await db.execute("ALTER TABLE farm_settings ADD COLUMN cloud_sync_enabled INTEGER NOT NULL DEFAULT 0;");
+            await db.execute(
+              "ALTER TABLE farm_settings ADD COLUMN cloud_sync_enabled INTEGER NOT NULL DEFAULT 0;",
+            );
           } catch (_) {}
           try {
-            await db.execute("ALTER TABLE farm_settings ADD COLUMN last_sync_timestamp TEXT;");
+            await db.execute(
+              "ALTER TABLE farm_settings ADD COLUMN last_sync_timestamp TEXT;",
+            );
           } catch (_) {}
           try {
-            await db.execute("ALTER TABLE flocks ADD COLUMN start_male_count INTEGER NOT NULL DEFAULT 0;");
+            await db.execute(
+              "ALTER TABLE flocks ADD COLUMN start_male_count INTEGER NOT NULL DEFAULT 0;",
+            );
           } catch (_) {}
           try {
-            await db.execute("ALTER TABLE flocks ADD COLUMN start_female_count INTEGER NOT NULL DEFAULT 0;");
+            await db.execute(
+              "ALTER TABLE flocks ADD COLUMN start_female_count INTEGER NOT NULL DEFAULT 0;",
+            );
           } catch (_) {}
           try {
-            await db.execute("ALTER TABLE incubation_batches ADD COLUMN is_transferred INTEGER NOT NULL DEFAULT 0;");
+            await db.execute(
+              "ALTER TABLE incubation_batches ADD COLUMN is_transferred INTEGER NOT NULL DEFAULT 0;",
+            );
           } catch (_) {}
           try {
-            await db.execute("ALTER TABLE incubation_batches ADD COLUMN transferred_flock_id TEXT;");
+            await db.execute(
+              "ALTER TABLE incubation_batches ADD COLUMN transferred_flock_id TEXT;",
+            );
           } catch (_) {}
 
           await _createSyncAndContentTables(db);
@@ -141,34 +161,54 @@ class DatabaseHelper {
       await db.execute("ALTER TABLE flocks ADD COLUMN hatch_date TEXT;");
     } catch (_) {}
     try {
-      await db.execute("ALTER TABLE farm_settings ADD COLUMN auto_feed_deduction INTEGER NOT NULL DEFAULT 0;");
+      await db.execute(
+        "ALTER TABLE farm_settings ADD COLUMN auto_feed_deduction INTEGER NOT NULL DEFAULT 0;",
+      );
     } catch (_) {}
     try {
-      await db.execute("ALTER TABLE farm_settings ADD COLUMN article_notifications_enabled INTEGER NOT NULL DEFAULT 1;");
+      await db.execute(
+        "ALTER TABLE farm_settings ADD COLUMN article_notifications_enabled INTEGER NOT NULL DEFAULT 1;",
+      );
     } catch (_) {}
     try {
-      await db.execute("ALTER TABLE farm_settings ADD COLUMN marketing_notifications_enabled INTEGER NOT NULL DEFAULT 0;");
+      await db.execute(
+        "ALTER TABLE farm_settings ADD COLUMN marketing_notifications_enabled INTEGER NOT NULL DEFAULT 0;",
+      );
     } catch (_) {}
     try {
-      await db.execute("ALTER TABLE farm_settings ADD COLUMN ads_enabled INTEGER NOT NULL DEFAULT 1;");
+      await db.execute(
+        "ALTER TABLE farm_settings ADD COLUMN ads_enabled INTEGER NOT NULL DEFAULT 1;",
+      );
     } catch (_) {}
     try {
-      await db.execute("ALTER TABLE farm_settings ADD COLUMN cloud_sync_enabled INTEGER NOT NULL DEFAULT 0;");
+      await db.execute(
+        "ALTER TABLE farm_settings ADD COLUMN cloud_sync_enabled INTEGER NOT NULL DEFAULT 0;",
+      );
     } catch (_) {}
     try {
-      await db.execute("ALTER TABLE farm_settings ADD COLUMN last_sync_timestamp TEXT;");
+      await db.execute(
+        "ALTER TABLE farm_settings ADD COLUMN last_sync_timestamp TEXT;",
+      );
     } catch (_) {}
     try {
-      await db.execute("ALTER TABLE flocks ADD COLUMN start_male_count INTEGER NOT NULL DEFAULT 0;");
+      await db.execute(
+        "ALTER TABLE flocks ADD COLUMN start_male_count INTEGER NOT NULL DEFAULT 0;",
+      );
     } catch (_) {}
     try {
-      await db.execute("ALTER TABLE flocks ADD COLUMN start_female_count INTEGER NOT NULL DEFAULT 0;");
+      await db.execute(
+        "ALTER TABLE flocks ADD COLUMN start_female_count INTEGER NOT NULL DEFAULT 0;",
+      );
     } catch (_) {}
     try {
-      await db.execute("ALTER TABLE incubation_batches ADD COLUMN is_transferred INTEGER NOT NULL DEFAULT 0;");
+      await db.execute(
+        "ALTER TABLE incubation_batches ADD COLUMN is_transferred INTEGER NOT NULL DEFAULT 0;",
+      );
     } catch (_) {}
     try {
-      await db.execute("ALTER TABLE incubation_batches ADD COLUMN transferred_flock_id TEXT;");
+      await db.execute(
+        "ALTER TABLE incubation_batches ADD COLUMN transferred_flock_id TEXT;",
+      );
     } catch (_) {}
 
     await _createSyncAndContentTables(db);
@@ -513,6 +553,37 @@ class DatabaseHelper {
     }
   }
 
+  Future<bool> isOnboardingCompleted() async {
+    final db = await database;
+    try {
+      final res = await db.rawQuery(
+        "SELECT value FROM app_kv WHERE key = 'onboarding_completed'",
+      );
+      if (res.isNotEmpty) {
+        return res.first['value'] == 'true';
+      }
+    } catch (_) {
+      try {
+        await db.execute(
+          'CREATE TABLE IF NOT EXISTS app_kv (key TEXT PRIMARY KEY, value TEXT)',
+        );
+      } catch (_) {}
+    }
+    return false;
+  }
+
+  Future<void> setOnboardingCompleted() async {
+    final db = await database;
+    try {
+      await db.execute(
+        'CREATE TABLE IF NOT EXISTS app_kv (key TEXT PRIMARY KEY, value TEXT)',
+      );
+      await db.rawInsert(
+        "INSERT OR REPLACE INTO app_kv (key, value) VALUES ('onboarding_completed', 'true')",
+      );
+    } catch (_) {}
+  }
+
   // ==================== Flocks ====================
   Future<List<Flock>> getFlocks({bool includeArchived = false}) async {
     final db = await database;
@@ -738,7 +809,9 @@ class DatabaseHelper {
 
         await txn.update(
           'feed_inventory',
-          item.copyWith(currentStockKg: newStock, updatedAt: DateTime.now()).toMap(),
+          item
+              .copyWith(currentStockKg: newStock, updatedAt: DateTime.now())
+              .toMap(),
           where: 'id = ?',
           whereArgs: [item.id],
         );
@@ -802,14 +875,20 @@ class DatabaseHelper {
         }
         await txn.update(
           'feed_inventory',
-          item.copyWith(currentStockKg: newStock, updatedAt: DateTime.now()).toMap(),
+          item
+              .copyWith(currentStockKg: newStock, updatedAt: DateTime.now())
+              .toMap(),
           where: 'id = ?',
           whereArgs: [item.id],
         );
       }
 
       // Delete associated financial expense if purchase
-      await txn.delete('finances', where: 'id = ?', whereArgs: ['fin_feed_$txId']);
+      await txn.delete(
+        'finances',
+        where: 'id = ?',
+        whereArgs: ['fin_feed_$txId'],
+      );
 
       // Delete from feed_transactions
       await txn.delete('feed_transactions', where: 'id = ?', whereArgs: [txId]);
@@ -855,7 +934,9 @@ class DatabaseHelper {
         }
         await txn.update(
           'feed_inventory',
-          item.copyWith(currentStockKg: newStock, updatedAt: DateTime.now()).toMap(),
+          item
+              .copyWith(currentStockKg: newStock, updatedAt: DateTime.now())
+              .toMap(),
           where: 'id = ?',
           whereArgs: [item.id],
         );
@@ -1615,7 +1696,10 @@ class DatabaseHelper {
   }
 
   // ==================== Articles CRUD ====================
-  Future<List<Article>> getArticles({String? category, bool? onlyPublished}) async {
+  Future<List<Article>> getArticles({
+    String? category,
+    bool? onlyPublished,
+  }) async {
     final db = await database;
     String? where;
     List<dynamic>? whereArgs;
@@ -1648,19 +1732,32 @@ class DatabaseHelper {
 
   Future<Article?> getArticleBySlug(String slug) async {
     final db = await database;
-    final maps = await db.query('articles', where: 'slug = ?', whereArgs: [slug]);
+    final maps = await db.query(
+      'articles',
+      where: 'slug = ?',
+      whereArgs: [slug],
+    );
     if (maps.isEmpty) return null;
     return Article.fromMap(maps.first);
   }
 
   Future<void> insertArticle(Article article) async {
     final db = await database;
-    await db.insert('articles', article.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+    await db.insert(
+      'articles',
+      article.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   Future<void> updateArticle(Article article) async {
     final db = await database;
-    await db.update('articles', article.toMap(), where: 'id = ?', whereArgs: [article.id]);
+    await db.update(
+      'articles',
+      article.toMap(),
+      where: 'id = ?',
+      whereArgs: [article.id],
+    );
   }
 
   Future<void> deleteArticle(String id) async {
@@ -1669,7 +1766,10 @@ class DatabaseHelper {
   }
 
   // ==================== Poultry Products CRUD ====================
-  Future<List<PoultryProduct>> getPoultryProducts({String? category, bool? onlyActive}) async {
+  Future<List<PoultryProduct>> getPoultryProducts({
+    String? category,
+    bool? onlyActive,
+  }) async {
     final db = await database;
     String? where;
     List<dynamic>? whereArgs;
@@ -1695,19 +1795,32 @@ class DatabaseHelper {
 
   Future<PoultryProduct?> getPoultryProductById(String id) async {
     final db = await database;
-    final maps = await db.query('poultry_products', where: 'id = ?', whereArgs: [id]);
+    final maps = await db.query(
+      'poultry_products',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
     if (maps.isEmpty) return null;
     return PoultryProduct.fromMap(maps.first);
   }
 
   Future<void> insertPoultryProduct(PoultryProduct product) async {
     final db = await database;
-    await db.insert('poultry_products', product.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+    await db.insert(
+      'poultry_products',
+      product.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   Future<void> updatePoultryProduct(PoultryProduct product) async {
     final db = await database;
-    await db.update('poultry_products', product.toMap(), where: 'id = ?', whereArgs: [product.id]);
+    await db.update(
+      'poultry_products',
+      product.toMap(),
+      where: 'id = ?',
+      whereArgs: [product.id],
+    );
   }
 
   Future<void> deletePoultryProduct(String id) async {
@@ -1782,25 +1895,41 @@ class DatabaseHelper {
   // ==================== Notification Campaigns CRUD ====================
   Future<List<NotificationCampaign>> getNotificationCampaigns() async {
     final db = await database;
-    final maps = await db.query('notification_campaigns', orderBy: 'created_at DESC');
+    final maps = await db.query(
+      'notification_campaigns',
+      orderBy: 'created_at DESC',
+    );
     return maps.map((m) => NotificationCampaign.fromMap(m)).toList();
   }
 
   Future<NotificationCampaign?> getNotificationCampaignById(String id) async {
     final db = await database;
-    final maps = await db.query('notification_campaigns', where: 'id = ?', whereArgs: [id]);
+    final maps = await db.query(
+      'notification_campaigns',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
     if (maps.isEmpty) return null;
     return NotificationCampaign.fromMap(maps.first);
   }
 
   Future<void> insertNotificationCampaign(NotificationCampaign campaign) async {
     final db = await database;
-    await db.insert('notification_campaigns', campaign.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+    await db.insert(
+      'notification_campaigns',
+      campaign.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   Future<void> updateNotificationCampaign(NotificationCampaign campaign) async {
     final db = await database;
-    await db.update('notification_campaigns', campaign.toMap(), where: 'id = ?', whereArgs: [campaign.id]);
+    await db.update(
+      'notification_campaigns',
+      campaign.toMap(),
+      where: 'id = ?',
+      whereArgs: [campaign.id],
+    );
   }
 
   Future<void> deleteNotificationCampaign(String id) async {
@@ -1818,7 +1947,8 @@ class DatabaseHelper {
   }) async {
     final db = await database;
     await db.insert('admin_audit_logs', {
-      'id': 'audit_${DateTime.now().millisecondsSinceEpoch}_${entityId.hashCode}',
+      'id':
+          'audit_${DateTime.now().millisecondsSinceEpoch}_${entityId.hashCode}',
       'action': action,
       'entity_type': entityType,
       'entity_id': entityId,

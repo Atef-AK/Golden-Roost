@@ -45,7 +45,8 @@ final samplePoultryProducts = [
     currency: 'USD',
     priceVerifiedDate: DateTime(2026, 2, 5),
     targetUrl: 'https://example.com/products/ceramic-brooder-150w',
-    affiliateUrl: 'https://example.com/products/ceramic-brooder-150w?ref=goldenroost',
+    affiliateUrl:
+        'https://example.com/products/ceramic-brooder-150w?ref=goldenroost',
     commercialDisclosure:
         'Golden Roost may earn a commission if you purchase through this link, at no additional cost to you.',
     isFeatured: true,
@@ -71,7 +72,8 @@ final samplePoultryProducts = [
     currency: 'USD',
     priceVerifiedDate: DateTime(2026, 2, 8),
     targetUrl: 'https://example.com/products/led-egg-candler',
-    affiliateUrl: 'https://example.com/products/led-egg-candler?ref=goldenroost',
+    affiliateUrl:
+        'https://example.com/products/led-egg-candler?ref=goldenroost',
     commercialDisclosure:
         'Golden Roost may earn a commission if you purchase through this link, at no additional cost to you.',
     isFeatured: false,
@@ -82,9 +84,11 @@ final samplePoultryProducts = [
   PoultryProduct(
     id: 'prod_auto_nipple_drinker_kit',
     category: 'drinkers',
-    nameEn: 'Heavy-Duty 360° Horizontal Poultry Nipple Drinker Kit (Pack of 12)',
+    nameEn:
+        'Heavy-Duty 360° Horizontal Poultry Nipple Drinker Kit (Pack of 12)',
     nameFr: 'Kit 12 Pipettes Abreuvoirs Horizontales 360° Anti-Gaspillage',
-    nameAr: 'مجموعة حلمات شرب أوتوماتيكية أفقية ٣٦٠ درجة (١٢ قطعة) مانعة للتسريب',
+    nameAr:
+        'مجموعة حلمات شرب أوتوماتيكية أفقية ٣٦٠ درجة (١٢ قطعة) مانعة للتسريب',
     descriptionEn:
         'Keeps drinking water 100% clean and free of bedding debris and feces. Stainless steel trigger mechanism prevents water dripping, keeping brooder litter dry and healthy.',
     descriptionFr:
@@ -97,7 +101,8 @@ final samplePoultryProducts = [
     currency: 'USD',
     priceVerifiedDate: DateTime(2026, 2, 10),
     targetUrl: 'https://example.com/products/nipple-drinkers-12pk',
-    affiliateUrl: 'https://example.com/products/nipple-drinkers-12pk?ref=goldenroost',
+    affiliateUrl:
+        'https://example.com/products/nipple-drinkers-12pk?ref=goldenroost',
     commercialDisclosure:
         'Golden Roost may earn a commission if you purchase through this link, at no additional cost to you.',
     isFeatured: false,
@@ -123,7 +128,8 @@ final samplePoultryProducts = [
     currency: 'USD',
     priceVerifiedDate: DateTime(2026, 2, 12),
     targetUrl: 'https://example.com/products/probe-hygrometer',
-    affiliateUrl: 'https://example.com/products/probe-hygrometer?ref=goldenroost',
+    affiliateUrl:
+        'https://example.com/products/probe-hygrometer?ref=goldenroost',
     commercialDisclosure:
         'Golden Roost may earn a commission if you purchase through this link, at no additional cost to you.',
     isFeatured: false,

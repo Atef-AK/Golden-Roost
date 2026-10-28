@@ -12,7 +12,8 @@ class GoldenRoostBannerAd extends ConsumerStatefulWidget {
   const GoldenRoostBannerAd({super.key, this.placement = 'article_footer'});
 
   @override
-  ConsumerState<GoldenRoostBannerAd> createState() => _GoldenRoostBannerAdState();
+  ConsumerState<GoldenRoostBannerAd> createState() =>
+      _GoldenRoostBannerAdState();
 }
 
 class _GoldenRoostBannerAdState extends ConsumerState<GoldenRoostBannerAd> {

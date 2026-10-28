@@ -4,12 +4,48 @@ class AppFormatters {
   /// Converts Eastern Arabic/Persian digits (٠-٩, ۰-۹) to standard Western Arabic numerals (0-9).
   static String toWesternNumerals(String input) {
     const eastern = [
-      '٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩',
-      '۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'
+      '٠',
+      '١',
+      '٢',
+      '٣',
+      '٤',
+      '٥',
+      '٦',
+      '٧',
+      '٨',
+      '٩',
+      '۰',
+      '۱',
+      '۲',
+      '۳',
+      '۴',
+      '۵',
+      '۶',
+      '۷',
+      '۸',
+      '۹',
     ];
     const western = [
-      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+      '0',
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      '0',
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
     ];
     for (int i = 0; i < eastern.length; i++) {
       input = input.replaceAll(eastern[i], western[i]);

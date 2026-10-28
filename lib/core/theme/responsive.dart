@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'app_theme.dart';
 
 class ResponsiveBreakpoints {
@@ -424,10 +424,7 @@ class SectionHeader extends StatelessWidget {
               ],
             ),
           ),
-          if (actionWidget != null) ...[
-            const SizedBox(width: 8),
-            actionWidget,
-          ],
+          if (actionWidget != null) ...[const SizedBox(width: 8), actionWidget],
         ],
       ),
     );

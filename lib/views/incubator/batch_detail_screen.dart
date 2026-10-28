@@ -35,9 +35,7 @@ class _BatchDetailScreenState extends ConsumerState<BatchDetailScreen> {
     if (batch == null) {
       return Scaffold(
         appBar: AppBar(title: Text(context.tr('batch_not_found_title'))),
-        body: Center(
-          child: Text(context.tr('batch_not_found_desc')),
-        ),
+        body: Center(child: Text(context.tr('batch_not_found_desc'))),
       );
     }
 
@@ -46,7 +44,9 @@ class _BatchDetailScreenState extends ConsumerState<BatchDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('${context.trSpecies(batch.species)} - ${context.tr('incubator_title')}'),
+        title: Text(
+          '${context.trSpecies(batch.species)} - ${context.tr('incubator_title')}',
+        ),
         actions: [
           PopupMenuButton<String>(
             onSelected: (val) {
@@ -89,7 +89,10 @@ class _BatchDetailScreenState extends ConsumerState<BatchDetailScreen> {
                   icon: const Icon(Icons.device_thermostat, size: 14),
                   label: FittedBox(
                     fit: BoxFit.scaleDown,
-                    child: Text(context.tr('incubator_log_reading'), maxLines: 1),
+                    child: Text(
+                      context.tr('incubator_log_reading'),
+                      maxLines: 1,
+                    ),
                   ),
                   onPressed: () => _showAddReadingDialog(batch),
                 ),
@@ -249,7 +252,10 @@ class _BatchDetailScreenState extends ConsumerState<BatchDetailScreen> {
                 children: [
                   Text(
                     context.tr('incubator_perf_rates'),
-                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                    ),
                   ),
                   const SizedBox(height: 14),
                   Row(
@@ -760,11 +766,9 @@ class _BatchDetailScreenState extends ConsumerState<BatchDetailScreen> {
                   );
               if (ctx.mounted) {
                 Navigator.pop(ctx);
-                ScaffoldMessenger.of(ctx).showSnackBar(
-                  SnackBar(
-                    content: Text(successMsg),
-                  ),
-                );
+                ScaffoldMessenger.of(
+                  ctx,
+                ).showSnackBar(SnackBar(content: Text(successMsg)));
               }
             },
             child: Text(context.tr('incubator_confirm_transfer')),
@@ -803,7 +807,8 @@ class _MetricItem extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.w800,
                   fontSize: 15,
-                  color: color ??
+                  color:
+                      color ??
                       (isDark
                           ? AppColors.textPrimaryDark
                           : AppColors.textPrimaryLight),
@@ -819,7 +824,9 @@ class _MetricItem extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
-                color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                color: isDark
+                    ? AppColors.textMutedDark
+                    : AppColors.textMutedLight,
               ),
             ),
           ],

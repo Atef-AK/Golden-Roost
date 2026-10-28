@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:golden_roost/core/localization/app_translations.dart';
 import 'package:golden_roost/core/theme/app_theme.dart';
 import 'package:golden_roost/core/theme/responsive.dart';
 
@@ -112,6 +113,48 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(find.text('ACTIVE BATCH'), findsOneWidget);
       expect(find.text('320px viewport without overflow'), findsOneWidget);
+    });
+
+    test('Four-language system (EN, FR, AR, ES) resolves correctly', () {
+      // English
+      expect(AppTranslations.get('nav_flocks', AppLanguage.en), 'Flocks');
+      expect(
+        AppTranslations.get('dash_eggs_today', AppLanguage.en),
+        'Eggs Today',
+      );
+
+      // French
+      expect(AppTranslations.get('nav_flocks', AppLanguage.fr), 'Troupeaux');
+      expect(
+        AppTranslations.get('dash_eggs_today', AppLanguage.fr),
+        'Œufs du Jour',
+      );
+
+      // Arabic
+      expect(AppTranslations.get('nav_flocks', AppLanguage.ar), 'القطعان');
+      expect(
+        AppTranslations.get('dash_eggs_today', AppLanguage.ar),
+        'بيض اليوم',
+      );
+
+      // Spanish (New in Golden Roost 2.0)
+      expect(AppTranslations.get('nav_flocks', AppLanguage.es), 'Lotes');
+      expect(
+        AppTranslations.get('dash_eggs_today', AppLanguage.es),
+        'Huevos de Hoy',
+      );
+      expect(
+        AppTranslations.get('feed_title', AppLanguage.es),
+        'Alimento e Inventario',
+      );
+    });
+
+    test('Golden Roost 2.0 design tokens match specification', () {
+      expect(AppColors.forestEmerald, const Color(0xFF176B4D));
+      expect(AppColors.deepForest, const Color(0xFF104735));
+      expect(AppColors.freshLeaf, const Color(0xFF79B85A));
+      expect(AppColors.goldenHarvest, const Color(0xFFE4AF49));
+      expect(AppColors.warmIvory, const Color(0xFFF8F7F1));
     });
   });
 }

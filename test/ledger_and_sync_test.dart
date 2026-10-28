@@ -8,42 +8,47 @@ import 'package:golden_roost/models/sync_item.dart';
 
 void main() {
   group('Feed Automation & Ledger Integrity Tests', () {
-    test('forecastDailyDemand is a read-only calculation and does not alter stock', () {
-      final now = DateTime.now();
-      final flock1 = Flock(
-        id: 'flock_1',
-        name: 'Layers 1',
-        species: 'chicken',
-        breed: 'Hy-Line',
-        purpose: 'layers',
-        acquisitionDate: now.subtract(const Duration(days: 140)), // 20 weeks
-        startCount: 200,
-        currentCount: 195, // 5 mortality
-        createdAt: now,
-      );
+    test(
+      'forecastDailyDemand is a read-only calculation and does not alter stock',
+      () {
+        final now = DateTime.now();
+        final flock1 = Flock(
+          id: 'flock_1',
+          name: 'Layers 1',
+          species: 'chicken',
+          breed: 'Hy-Line',
+          purpose: 'layers',
+          acquisitionDate: now.subtract(const Duration(days: 140)), // 20 weeks
+          startCount: 200,
+          currentCount: 195, // 5 mortality
+          createdAt: now,
+        );
 
-      final flock2 = Flock(
-        id: 'flock_2',
-        name: 'Broilers 2',
-        species: 'chicken',
-        breed: 'Ross 308',
-        purpose: 'meat',
-        acquisitionDate: now.subtract(const Duration(days: 21)), // 3 weeks
-        startCount: 500,
-        currentCount: 490,
-        createdAt: now,
-      );
+        final flock2 = Flock(
+          id: 'flock_2',
+          name: 'Broilers 2',
+          species: 'chicken',
+          breed: 'Ross 308',
+          purpose: 'meat',
+          acquisitionDate: now.subtract(const Duration(days: 21)), // 3 weeks
+          startCount: 500,
+          currentCount: 490,
+          createdAt: now,
+        );
 
-      // Adult layer at 20 weeks ~118g/bird * 195 birds = 23.01 kg
-      // 3-week broiler ~108g/bird * 490 birds = 52.92 kg; Total combined = 75.93 kg
-      final forecast1 = FeedAutomationService.instance
-          .forecastDailyDemand(flocks: [flock1]).totalDemandKg;
-      final forecastCombined = FeedAutomationService.instance
-          .forecastDailyDemand(flocks: [flock1, flock2]).totalDemandKg;
+        // Adult layer at 20 weeks ~118g/bird * 195 birds = 23.01 kg
+        // 3-week broiler ~108g/bird * 490 birds = 52.92 kg; Total combined = 75.93 kg
+        final forecast1 = FeedAutomationService.instance
+            .forecastDailyDemand(flocks: [flock1])
+            .totalDemandKg;
+        final forecastCombined = FeedAutomationService.instance
+            .forecastDailyDemand(flocks: [flock1, flock2])
+            .totalDemandKg;
 
-      expect(forecast1, closeTo(23.01, 0.01));
-      expect(forecastCombined, closeTo(75.93, 0.01));
-    });
+        expect(forecast1, closeTo(23.01, 0.01));
+        expect(forecastCombined, closeTo(75.93, 0.01));
+      },
+    );
 
     test('calculateDaysBeforeRefill and refill date projection', () {
       const totalStock = 542.75;
@@ -154,7 +159,10 @@ void main() {
         createdAt: now,
       );
 
-      expect(product.effectiveUrl, 'https://example.com/item/1?ref=goldenroost');
+      expect(
+        product.effectiveUrl,
+        'https://example.com/item/1?ref=goldenroost',
+      );
       expect(
         product.commercialDisclosure.contains('affiliate commission') ||
             product.commercialDisclosure.contains('commission'),

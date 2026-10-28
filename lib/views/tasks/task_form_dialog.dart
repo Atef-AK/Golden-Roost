@@ -115,14 +115,38 @@ class _TaskFormDialogState extends ConsumerState<TaskFormDialog> {
                   labelText: context.tr('finance_category'),
                 ),
                 items: [
-                  DropdownMenuItem(value: 'feeding', child: Text(context.trTaskCategory('feeding'))),
-                  DropdownMenuItem(value: 'watering', child: Text(context.trTaskCategory('watering'))),
-                  DropdownMenuItem(value: 'cleaning', child: Text(context.trTaskCategory('cleaning'))),
-                  DropdownMenuItem(value: 'vaccination', child: Text(context.trTaskCategory('vaccination'))),
-                  DropdownMenuItem(value: 'weighing', child: Text(context.trTaskCategory('weighing'))),
-                  DropdownMenuItem(value: 'incubation', child: Text(context.trTaskCategory('incubation'))),
-                  DropdownMenuItem(value: 'maintenance', child: Text(context.trTaskCategory('maintenance'))),
-                  DropdownMenuItem(value: 'general', child: Text(context.trTaskCategory('general'))),
+                  DropdownMenuItem(
+                    value: 'feeding',
+                    child: Text(context.trTaskCategory('feeding')),
+                  ),
+                  DropdownMenuItem(
+                    value: 'watering',
+                    child: Text(context.trTaskCategory('watering')),
+                  ),
+                  DropdownMenuItem(
+                    value: 'cleaning',
+                    child: Text(context.trTaskCategory('cleaning')),
+                  ),
+                  DropdownMenuItem(
+                    value: 'vaccination',
+                    child: Text(context.trTaskCategory('vaccination')),
+                  ),
+                  DropdownMenuItem(
+                    value: 'weighing',
+                    child: Text(context.trTaskCategory('weighing')),
+                  ),
+                  DropdownMenuItem(
+                    value: 'incubation',
+                    child: Text(context.trTaskCategory('incubation')),
+                  ),
+                  DropdownMenuItem(
+                    value: 'maintenance',
+                    child: Text(context.trTaskCategory('maintenance')),
+                  ),
+                  DropdownMenuItem(
+                    value: 'general',
+                    child: Text(context.trTaskCategory('general')),
+                  ),
                 ],
                 onChanged: (val) => setState(() => _category = val!),
               ),
@@ -208,13 +232,30 @@ class _TaskFormDialogState extends ConsumerState<TaskFormDialog> {
               DropdownButtonFormField<String>(
                 isExpanded: true,
                 initialValue: _recurrence,
-                decoration: InputDecoration(labelText: context.tr('tasks_repeat')),
+                decoration: InputDecoration(
+                  labelText: context.tr('tasks_repeat'),
+                ),
                 items: [
-                  DropdownMenuItem(value: 'none', child: Text(context.trRecurrence('none'))),
-                  DropdownMenuItem(value: 'daily', child: Text(context.trRecurrence('daily'))),
-                  DropdownMenuItem(value: 'weekly', child: Text(context.trRecurrence('weekly'))),
-                  DropdownMenuItem(value: 'biweekly', child: Text(context.trRecurrence('biweekly'))),
-                  DropdownMenuItem(value: 'monthly', child: Text(context.trRecurrence('monthly'))),
+                  DropdownMenuItem(
+                    value: 'none',
+                    child: Text(context.trRecurrence('none')),
+                  ),
+                  DropdownMenuItem(
+                    value: 'daily',
+                    child: Text(context.trRecurrence('daily')),
+                  ),
+                  DropdownMenuItem(
+                    value: 'weekly',
+                    child: Text(context.trRecurrence('weekly')),
+                  ),
+                  DropdownMenuItem(
+                    value: 'biweekly',
+                    child: Text(context.trRecurrence('biweekly')),
+                  ),
+                  DropdownMenuItem(
+                    value: 'monthly',
+                    child: Text(context.trRecurrence('monthly')),
+                  ),
                 ],
                 onChanged: (val) => setState(() => _recurrence = val!),
               ),

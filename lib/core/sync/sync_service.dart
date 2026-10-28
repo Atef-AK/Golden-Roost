@@ -3,13 +3,7 @@ import 'dart:convert';
 import '../../models/sync_item.dart';
 import '../database/database_helper.dart';
 
-enum SyncStatus {
-  idle,
-  syncing,
-  success,
-  offline,
-  error,
-}
+enum SyncStatus { idle, syncing, success, offline, error }
 
 class SyncResult {
   final int syncedCount;
@@ -81,11 +75,7 @@ class SyncService {
     Future<bool> Function(SyncTombstone tombstone)? cloudTombstoneAdapter,
   }) async {
     if (_currentStatus == SyncStatus.syncing) {
-      return SyncResult(
-        syncedCount: 0,
-        failedCount: 0,
-        status: _currentStatus,
-      );
+      return SyncResult(syncedCount: 0, failedCount: 0, status: _currentStatus);
     }
 
     _setStatus(SyncStatus.syncing);
@@ -103,8 +93,8 @@ class SyncService {
     }
 
     final pendingItems = await DatabaseHelper.instance.getPendingSyncItems();
-    final pendingTombstones =
-        await DatabaseHelper.instance.getPendingTombstones();
+    final pendingTombstones = await DatabaseHelper.instance
+        .getPendingTombstones();
 
     if (pendingItems.isEmpty && pendingTombstones.isEmpty) {
       _lastSyncTime = DateTime.now();
@@ -196,12 +186,12 @@ class SyncService {
     _lastSyncTime = DateTime.now();
 
     // Verify whether any items or tombstones remain pending in SQLite
-    final remainingItems =
-        await DatabaseHelper.instance.getPendingSyncItems();
-    final remainingTombstones =
-        await DatabaseHelper.instance.getPendingTombstones();
+    final remainingItems = await DatabaseHelper.instance.getPendingSyncItems();
+    final remainingTombstones = await DatabaseHelper.instance
+        .getPendingTombstones();
 
-    final isFullySynced = remainingItems.isEmpty &&
+    final isFullySynced =
+        remainingItems.isEmpty &&
         remainingTombstones.isEmpty &&
         failedCount == 0;
 

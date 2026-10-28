@@ -23,7 +23,8 @@ class DashboardAnalyticsCard extends ConsumerStatefulWidget {
       _DashboardAnalyticsCardState();
 }
 
-class _DashboardAnalyticsCardState extends ConsumerState<DashboardAnalyticsCard> {
+class _DashboardAnalyticsCardState
+    extends ConsumerState<DashboardAnalyticsCard> {
   int _selectedTab = 0; // 0: Egg Yield, 1: Cash Flow, 2: Feed Runway
 
   @override
@@ -141,17 +142,17 @@ class _DashboardAnalyticsCardState extends ConsumerState<DashboardAnalyticsCard>
                     isDark: isDark,
                   )
                 : _selectedTab == 1
-                    ? _CashFlowChart(
-                        key: const ValueKey('cash_chart'),
-                        finances: finances,
-                        currency: settings.currency,
-                        isDark: isDark,
-                      )
-                    : _FeedRunwayIndicator(
-                        key: const ValueKey('feed_runway'),
-                        stats: stats,
-                        isDark: isDark,
-                      ),
+                ? _CashFlowChart(
+                    key: const ValueKey('cash_chart'),
+                    finances: finances,
+                    currency: settings.currency,
+                    isDark: isDark,
+                  )
+                : _FeedRunwayIndicator(
+                    key: const ValueKey('feed_runway'),
+                    stats: stats,
+                    isDark: isDark,
+                  ),
           ),
         ],
       ),
@@ -208,7 +209,9 @@ class _TabButton extends StatelessWidget {
               size: 13,
               color: isSelected
                   ? activeColor
-                  : (isDark ? AppColors.textMutedDark : AppColors.textMutedLight),
+                  : (isDark
+                        ? AppColors.textMutedDark
+                        : AppColors.textMutedLight),
             ),
             const SizedBox(width: 4),
             Flexible(
@@ -219,11 +222,11 @@ class _TabButton extends StatelessWidget {
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                   color: isSelected
                       ? (isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimaryLight)
+                            ? AppColors.textPrimaryDark
+                            : AppColors.textPrimaryLight)
                       : (isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondaryLight),
+                            ? AppColors.textSecondaryDark
+                            : AppColors.textSecondaryLight),
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -389,13 +392,14 @@ class _EggTrendChart extends StatelessWidget {
                                 ).format(day),
                           style: TextStyle(
                             fontSize: 9.5,
-                            fontWeight:
-                                isToday ? FontWeight.w700 : FontWeight.w500,
+                            fontWeight: isToday
+                                ? FontWeight.w700
+                                : FontWeight.w500,
                             color: isToday
                                 ? AppColors.warning
                                 : (isDark
-                                    ? AppColors.textSecondaryDark
-                                    : AppColors.textSecondaryLight),
+                                      ? AppColors.textSecondaryDark
+                                      : AppColors.textSecondaryLight),
                           ),
                         ),
                       );
@@ -524,7 +528,10 @@ class _CashFlowChart extends StatelessWidget {
     double maxVal = 0.0;
     for (int i = 0; i < last7Days.length; i++) {
       final key = DateFormat('yyyy-MM-dd').format(last7Days[i]);
-      maxVal = max(maxVal, max(dailyIncome[key] ?? 0.0, dailyExpense[key] ?? 0.0));
+      maxVal = max(
+        maxVal,
+        max(dailyIncome[key] ?? 0.0, dailyExpense[key] ?? 0.0),
+      );
     }
     final double maxY = max(50.0, (maxVal * 1.25).ceilToDouble());
     final double net7d = totalIncome7d - totalExpense7d;
@@ -544,13 +551,17 @@ class _CashFlowChart extends StatelessWidget {
               toY: inc,
               color: AppColors.semanticSuccess,
               width: 7,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(3),
+              ),
             ),
             BarChartRodData(
               toY: exp,
               color: const Color(0xFFE11D48),
               width: 7,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(3),
+              ),
             ),
           ],
         ),
@@ -565,20 +576,25 @@ class _CashFlowChart extends StatelessWidget {
           children: [
             _MiniKpi(
               label: context.tr('dash_income'),
-              value: '+${AppFormatters.formatCurrency(totalIncome7d, currency)}',
+              value:
+                  '+${AppFormatters.formatCurrency(totalIncome7d, currency)}',
               color: AppColors.semanticSuccess,
             ),
             const SizedBox(width: 10),
             _MiniKpi(
               label: context.tr('dash_expense'),
-              value: '-${AppFormatters.formatCurrency(totalExpense7d, currency)}',
+              value:
+                  '-${AppFormatters.formatCurrency(totalExpense7d, currency)}',
               color: const Color(0xFFE11D48),
             ),
             const SizedBox(width: 10),
             _MiniKpi(
               label: context.tr('dash_net'),
-              value: '${net7d >= 0 ? '+' : ''}${AppFormatters.formatCurrency(net7d, currency)}',
-              color: net7d >= 0 ? AppColors.semanticSuccess : const Color(0xFFE11D48),
+              value:
+                  '${net7d >= 0 ? '+' : ''}${AppFormatters.formatCurrency(net7d, currency)}',
+              color: net7d >= 0
+                  ? AppColors.semanticSuccess
+                  : const Color(0xFFE11D48),
             ),
           ],
         ),
@@ -650,13 +666,14 @@ class _CashFlowChart extends StatelessWidget {
                                 ).format(day),
                           style: TextStyle(
                             fontSize: 9.5,
-                            fontWeight:
-                                isToday ? FontWeight.w700 : FontWeight.w500,
+                            fontWeight: isToday
+                                ? FontWeight.w700
+                                : FontWeight.w500,
                             color: isToday
                                 ? AppColors.primaryTeal
                                 : (isDark
-                                    ? AppColors.textSecondaryDark
-                                    : AppColors.textSecondaryLight),
+                                      ? AppColors.textSecondaryDark
+                                      : AppColors.textSecondaryLight),
                           ),
                         ),
                       );
@@ -716,23 +733,24 @@ class _FeedRunwayIndicator extends StatelessWidget {
     final dailyBurnKg = stats.dailyFeedDemandKg;
     final hasBirds = stats.totalLiveBirds > 0;
     final isCritical = hasBirds && stockKg > 0 && daysRemaining <= 3;
-    final isWarning = hasBirds && stockKg > 0 && daysRemaining > 3 && daysRemaining <= 7;
+    final isWarning =
+        hasBirds && stockKg > 0 && daysRemaining > 3 && daysRemaining <= 7;
 
     final statusColor = !hasBirds || stockKg <= 0
         ? AppColors.primaryTeal
         : (isCritical
-            ? AppColors.error
-            : isWarning
-                ? AppColors.warning
-                : AppColors.semanticSuccess);
+              ? AppColors.error
+              : isWarning
+              ? AppColors.warning
+              : AppColors.semanticSuccess);
 
     final statusText = !hasBirds
         ? context.tr('flocks_empty')
         : (stockKg <= 0
-            ? context.tr('dash_feed_status_critical')
-            : (isCritical
-                ? context.tr('dash_feed_status_critical')
-                : isWarning
+              ? context.tr('dash_feed_status_critical')
+              : (isCritical
+                    ? context.tr('dash_feed_status_critical')
+                    : isWarning
                     ? context.tr('dash_feed_status_warning')
                     : context.tr('dash_feed_status_good')));
 
@@ -743,10 +761,7 @@ class _FeedRunwayIndicator extends StatelessWidget {
           decoration: BoxDecoration(
             color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: statusColor.withAlpha(60),
-              width: 1,
-            ),
+            border: Border.all(color: statusColor.withAlpha(60), width: 1),
           ),
           child: Column(
             children: [

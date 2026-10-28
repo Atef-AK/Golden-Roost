@@ -12,11 +12,7 @@ class EggLogFormDialog extends ConsumerStatefulWidget {
   final String? initialFlockId;
   final EggLog? initialLog;
 
-  const EggLogFormDialog({
-    super.key,
-    this.initialFlockId,
-    this.initialLog,
-  });
+  const EggLogFormDialog({super.key, this.initialFlockId, this.initialLog});
 
   static Future<void> show(
     BuildContext context, {
@@ -128,7 +124,9 @@ class _EggLogFormDialogState extends ConsumerState<EggLogFormDialog> {
                     child: DropdownButtonFormField<String>(
                       isExpanded: true,
                       initialValue: _collectionTime,
-                      decoration: InputDecoration(labelText: context.tr('time')),
+                      decoration: InputDecoration(
+                        labelText: context.tr('time'),
+                      ),
                       items: [
                         DropdownMenuItem(
                           value: 'total',
@@ -159,7 +157,10 @@ class _EggLogFormDialogState extends ConsumerState<EggLogFormDialog> {
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   labelText: context.tr('eggs_total'),
-                  suffixIcon: const Icon(AppIcons.eggs, color: AppColors.warning),
+                  suffixIcon: const Icon(
+                    AppIcons.eggs,
+                    color: AppColors.warning,
+                  ),
                 ),
                 validator: (val) {
                   if (val == null || val.isEmpty) return 'Enter egg count';
@@ -199,7 +200,10 @@ class _EggLogFormDialogState extends ConsumerState<EggLogFormDialog> {
                 decoration: InputDecoration(
                   labelText: context.tr('eggs_incubation'),
                   helperText: context.tr('eggs_incubation_helper'),
-                  prefixIcon: const Icon(AppIcons.incubator, color: AppColors.warning),
+                  prefixIcon: const Icon(
+                    AppIcons.incubator,
+                    color: AppColors.warning,
+                  ),
                 ),
               ),
               const SizedBox(height: 12),

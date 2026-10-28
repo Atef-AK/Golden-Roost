@@ -102,27 +102,39 @@ class _BatchFormScreenState extends ConsumerState<BatchFormScreen> {
                 items: [
                   DropdownMenuItem(
                     value: 'chicken',
-                    child: Text('${context.tr('species_chicken')} (21 ${context.tr('flocks_days')})'),
+                    child: Text(
+                      '${context.tr('species_chicken')} (21 ${context.tr('flocks_days')})',
+                    ),
                   ),
                   DropdownMenuItem(
                     value: 'quail',
-                    child: Text('${context.tr('species_quail')} (17 ${context.tr('flocks_days')})'),
+                    child: Text(
+                      '${context.tr('species_quail')} (17 ${context.tr('flocks_days')})',
+                    ),
                   ),
                   DropdownMenuItem(
                     value: 'duck',
-                    child: Text('${context.tr('species_duck')} (28 ${context.tr('flocks_days')})'),
+                    child: Text(
+                      '${context.tr('species_duck')} (28 ${context.tr('flocks_days')})',
+                    ),
                   ),
                   DropdownMenuItem(
                     value: 'turkey',
-                    child: Text('${context.tr('species_turkey')} (28 ${context.tr('flocks_days')})'),
+                    child: Text(
+                      '${context.tr('species_turkey')} (28 ${context.tr('flocks_days')})',
+                    ),
                   ),
                   DropdownMenuItem(
                     value: 'goose',
-                    child: Text('${context.tr('species_goose')} (30 ${context.tr('flocks_days')})'),
+                    child: Text(
+                      '${context.tr('species_goose')} (30 ${context.tr('flocks_days')})',
+                    ),
                   ),
                   DropdownMenuItem(
                     value: 'other',
-                    child: Text('${context.tr('species_other')} (${context.tr('recurrence_custom')})'),
+                    child: Text(
+                      '${context.tr('species_other')} (${context.tr('recurrence_custom')})',
+                    ),
                   ),
                 ],
                 onChanged: (val) {
@@ -163,7 +175,9 @@ class _BatchFormScreenState extends ConsumerState<BatchFormScreen> {
                     ...flocks.map(
                       (f) => DropdownMenuItem(
                         value: f.id,
-                        child: Text('${f.name} (${context.trSpecies(f.species)})'),
+                        child: Text(
+                          '${f.name} (${context.trSpecies(f.species)})',
+                        ),
                       ),
                     ),
                   ],

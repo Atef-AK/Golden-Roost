@@ -18,10 +18,16 @@ class SampleDataGenerator {
     final currentSettings = await db.getSettings();
     await db.updateSettings(
       currentSettings.copyWith(
-        farmName: currentSettings.farmName == 'My Poultry Farm' || currentSettings.farmName.isEmpty
-            ? (currentSettings.language == 'ar' ? 'مزرعة البركة للدواجن' : 'El-Baraka Poultry Farm')
+        farmName:
+            currentSettings.farmName == 'My Poultry Farm' ||
+                currentSettings.farmName.isEmpty
+            ? (currentSettings.language == 'ar'
+                  ? 'مزرعة البركة للدواجن'
+                  : 'El-Baraka Poultry Farm')
             : currentSettings.farmName,
-        electricityKwhRate: currentSettings.electricityKwhRate > 0 ? currentSettings.electricityKwhRate : 0.280,
+        electricityKwhRate: currentSettings.electricityKwhRate > 0
+            ? currentSettings.electricityKwhRate
+            : 0.280,
       ),
     );
 

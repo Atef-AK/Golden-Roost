@@ -95,7 +95,10 @@ class _WaterCareDialogState extends ConsumerState<WaterCareDialog> {
                 decoration: InputDecoration(
                   labelText: context.tr('water_consumed_label'),
                   hintText: context.tr('water_consumed_hint'),
-                  prefixIcon: const Icon(AppIcons.water, color: Color(0xFF06B6D4)),
+                  prefixIcon: const Icon(
+                    AppIcons.water,
+                    color: Color(0xFF06B6D4),
+                  ),
                   suffixText: 'L',
                 ),
               ),

@@ -16,99 +16,134 @@ class MoreMenuScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final menuItems = [
+    final productionItems = [
       _MoreTile(
         title: context.tr('tasks_title'),
         subtitle: context.tr('more_tasks_sub'),
         icon: Icons.calendar_month_outlined,
-        color: AppColors.primaryTeal,
+        color: AppColors.forestEmerald,
         route: '/tasks',
       ),
       _MoreTile(
         title: context.tr('eggs_title'),
         subtitle: context.tr('more_eggs_sub'),
         icon: Icons.egg_outlined,
-        color: AppColors.primaryTeal,
+        color: AppColors.goldenHarvest,
         route: '/eggs',
       ),
       _MoreTile(
         title: context.tr('feed_title'),
         subtitle: context.tr('more_feed_sub'),
-        icon: Icons.restaurant,
-        color: AppColors.semanticSuccess,
+        icon: Icons.grain_rounded,
+        color: AppColors.freshLeaf,
         route: '/feed',
-      ),
-      _MoreTile(
-        title: context.tr('reports_title'),
-        subtitle: context.tr('more_reports_sub'),
-        icon: Icons.bar_chart_outlined,
-        color: AppColors.primaryTeal,
-        route: '/reports',
       ),
       _MoreTile(
         title: context.tr('finance_electricity'),
         subtitle: context.tr('more_electricity_sub'),
-        icon: Icons.bolt,
-        color: AppColors.semanticWarning,
+        icon: Icons.bolt_rounded,
+        color: AppColors.goldenHarvest,
         route: '/finance/electricity',
       ),
+    ];
+
+    final discoverItems = [
       _MoreTile(
-        title: 'Articles & Vet Care',
-        subtitle: 'Brooding, vaccination, and flock health guides',
+        title: context.tr('articles_title'),
+        subtitle: context.tr('articles_search'),
         icon: Icons.menu_book_outlined,
-        color: AppColors.primaryTeal,
+        color: AppColors.forestEmerald,
         route: '/articles',
       ),
       _MoreTile(
-        title: 'Equipment & Supplies',
-        subtitle: 'Verified incubators, brooders, candlers & gear',
+        title: context.tr('products_title'),
+        subtitle: context.tr('products_view_merchant'),
         icon: Icons.storefront_outlined,
-        color: AppColors.primaryTeal,
+        color: AppColors.goldenHarvest,
         route: '/products',
       ),
+    ];
+
+    final systemItems = [
       _MoreTile(
-        title: 'Admin Portal (Web)',
-        subtitle: 'Access content management & push campaigns',
-        icon: Icons.shield_outlined,
-        color: AppColors.semanticWarning,
-        route: '/admin',
+        title: context.tr('reports_title'),
+        subtitle: context.tr('more_reports_sub'),
+        icon: Icons.bar_chart_outlined,
+        color: AppColors.info,
+        route: '/reports',
       ),
       _MoreTile(
         title: context.tr('settings_title'),
         subtitle: context.tr('more_settings_sub'),
         icon: Icons.settings_outlined,
-        color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+        color: isDark ? const Color(0xFF8BA093) : AppColors.secondaryText,
         route: '/settings',
+      ),
+      _MoreTile(
+        title: 'Admin Portal',
+        subtitle: 'Content & Push Campaigns',
+        icon: Icons.admin_panel_settings_outlined,
+        color: AppColors.warning,
+        route: '/admin',
       ),
     ];
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.tr('nav_more'))),
+      appBar: AppBar(
+        title: Text(
+          context.tr('nav_more'),
+          style: const TextStyle(fontWeight: FontWeight.w800),
+        ),
+        centerTitle: false,
+      ),
       body: ResponsiveContainer(
         maxWidth: 900,
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
           children: [
             // Header farm banner
-            PremiumCard(
+            Container(
               padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.surfaceDark : Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                  width: 1.0,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withAlpha(isDark ? 50 : 8),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
               child: Row(
                 children: [
                   Container(
-                    width: 48,
-                    height: 48,
+                    width: 52,
+                    height: 52,
                     decoration: BoxDecoration(
-                      color: AppColors.primaryTeal,
-                      borderRadius: BorderRadius.circular(12),
+                      gradient: LinearGradient(
+                        colors: [AppColors.forestEmerald, AppColors.deepForest],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.forestEmerald.withAlpha(60),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
                     child: const Center(
-                      child: ChickenIcon(
-                        color: Colors.white,
-                        size: 26,
-                      ),
+                      child: ChickenIcon(color: Colors.white, size: 28),
                     ),
                   ),
-                  const SizedBox(width: 14),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,9 +153,13 @@ class MoreMenuScreen extends ConsumerWidget {
                             Flexible(
                               child: Text(
                                 settings.farmName,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 16,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 17,
+                                  letterSpacing: -0.3,
+                                  color: isDark
+                                      ? Colors.white
+                                      : AppColors.mainInk,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -138,9 +177,10 @@ class MoreMenuScreen extends ConsumerWidget {
                           '${context.tr('more_sqlite_info')} • ${settings.currency} • ${settings.language.toUpperCase()}',
                           style: TextStyle(
                             fontSize: 12,
+                            fontWeight: FontWeight.w500,
                             color: isDark
-                                ? AppColors.textMutedDark
-                                : AppColors.textMutedLight,
+                                ? AppColors.textSecondaryDark
+                                : AppColors.secondaryText,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -151,99 +191,153 @@ class MoreMenuScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 22),
 
-            LayoutBuilder(
-              builder: (ctx, constraints) {
-                final isWide = constraints.maxWidth >= 600;
-                if (isWide) {
-                  return GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          mainAxisExtent: 80,
-                        ),
-                    itemCount: menuItems.length,
-                    itemBuilder: (ctx, i) =>
-                        _buildMenuItem(menuItems[i], isDark),
-                  );
-                }
-                return Column(
-                  children: menuItems
-                      .map(
-                        (item) => Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: _buildMenuItem(item, isDark),
-                        ),
-                      )
-                      .toList(),
-                );
-              },
-            ),
+            // 1. Operations & Resources
+            _buildSectionHeader('OPERATIONS & LOGISTICS', isDark),
+            const SizedBox(height: 8),
+            _buildGridOrList(productionItems, isDark),
+            const SizedBox(height: 20),
+
+            // 2. Discover & Knowledge
+            _buildSectionHeader('KNOWLEDGE & EQUIPMENT', isDark),
+            const SizedBox(height: 8),
+            _buildGridOrList(discoverItems, isDark),
+            const SizedBox(height: 20),
+
+            // 3. System & Settings
+            _buildSectionHeader('SYSTEM & ADMINISTRATION', isDark),
+            const SizedBox(height: 8),
+            _buildGridOrList(systemItems, isDark),
           ],
         ),
       ),
     );
   }
 
+  Widget _buildSectionHeader(String title, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 11.5,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 1.1,
+          color: isDark ? const Color(0xFF7A8D81) : const Color(0xFF6A7B70),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGridOrList(List<_MoreTile> items, bool isDark) {
+    return LayoutBuilder(
+      builder: (ctx, constraints) {
+        final isWide = constraints.maxWidth >= 600;
+        if (isWide) {
+          return GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              mainAxisExtent: 82,
+            ),
+            itemCount: items.length,
+            itemBuilder: (ctx, i) => _buildMenuItem(items[i], isDark),
+          );
+        }
+        return Column(
+          children: items
+              .map(
+                (item) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: _buildMenuItem(item, isDark),
+                ),
+              )
+              .toList(),
+        );
+      },
+    );
+  }
+
   Widget _buildMenuItem(_MoreTile item, bool isDark) {
     return Builder(
       builder: (context) {
-        return PremiumCard(
-          onTap: () => context.push(item.route),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: item.color.withAlpha(isDark ? 25 : 20),
-                  borderRadius: BorderRadius.circular(10),
+        return Container(
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.surfaceDark : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark ? AppColors.borderDark : AppColors.borderLight,
+              width: 1.0,
+            ),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => context.push(item.route),
+              borderRadius: BorderRadius.circular(16),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
                 ),
-                child: Icon(item.icon, color: item.color, size: 20),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                child: Row(
                   children: [
-                    Text(
-                      item.title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: item.color.withAlpha(isDark ? 36 : 22),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      child: Icon(item.icon, color: item.color, size: 22),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      item.subtitle,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: isDark
-                            ? AppColors.textMutedDark
-                            : AppColors.textMutedLight,
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            item.title,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14.5,
+                              letterSpacing: -0.2,
+                              color: isDark ? Colors.white : AppColors.mainInk,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            item.subtitle,
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              color: isDark
+                                  ? AppColors.textSecondaryDark
+                                  : AppColors.secondaryText,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 15,
+                      color: isDark
+                          ? const Color(0xFF56695E)
+                          : const Color(0xFFB5C1B8),
                     ),
                   ],
                 ),
               ),
-              Icon(
-                Icons.chevron_right,
-                size: 20,
-                color: isDark
-                    ? AppColors.textMutedDark
-                    : AppColors.textMutedLight,
-              ),
-            ],
+            ),
           ),
         );
       },
